@@ -2,9 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 
 const Page = () => {
+  const { push } = useRouter();
   const [userSignUp, setUserSignUp] = useState({
     name: "",
     email: "",
@@ -54,7 +56,10 @@ const Page = () => {
         </Button>
       </div>
       <div className="flex flex-col items-center">
-        Already have an account?<div className="text-blue-400">Log in</div>
+        Already have an account?
+        <div className="text-blue-400" onClick={() => push("login")}>
+          Log in
+        </div>
       </div>
     </div>
   );

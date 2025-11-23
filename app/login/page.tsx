@@ -2,28 +2,28 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 
 const Page = () => {
-  const [userSignUp, setUserSignUp] = useState({
-    name: "",
+  const { push } = useRouter();
+  const [userLogin, setUserLogin] = useState({
     email: "",
     password: "",
   });
-  console.log(userSignUp);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setUserSignUp({
-      ...userSignUp,
+    setUserLogin({
+      ...userLogin,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSignUp = async () => {
+  const handleLogin = async () => {
     await fetch("/api/user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userSignUp),
+      body: JSON.stringify(userLogin),
     });
   };
 
@@ -33,22 +33,22 @@ const Page = () => {
         <Input
           name="email"
           placeholder="email here..."
-          value={userSignUp.email}
+          value={userLogin.email}
           onChange={handleChange}
         />
         <Input
           name="password"
           type="password"
           placeholder="password here..."
-          value={userSignUp.password}
+          value={userLogin.password}
           onChange={handleChange}
         />
-        <Button variant="secondary" onClick={handleSignUp}>
+        <Button variant="secondary" onClick={handleLogin}>
           Log in
         </Button>
       </div>
       <div className="flex flex-col items-center">
-        Do not have an account?<div className="text-blue-400">Sign Up</div>
+        Do not have an account?<div className="text-blue-400" onClick={() => push("/signup")}>Sign Up</div>
       </div>
     </div>
   );
