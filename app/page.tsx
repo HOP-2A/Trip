@@ -1,8 +1,22 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from "./_components/Header";
+import { useRouter } from "next/navigation";
+import { YourTrip } from "./_components/YourTrip";
+import { FeaturedTrip } from "./_components/FeaturedTrip";
+import { useState } from "react";
 
 export default function Home() {
+  const [count, setCount] = useState(0);
+  const { push } = useRouter();
+
+  const plusPeople = () => {
+    let amount: number = 0;
+    amount = amount + 1;
+    setCount(amount);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 relative">
       <Header />
@@ -16,28 +30,56 @@ export default function Home() {
           <h1 className="text-white text-5xl font-extrabold text-center px-4">
             Plan Your Next Adventure
           </h1>
-          <Button className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:scale-105 transition-transform">
-            Start Planning
-          </Button>
+          <div className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold  rounded-lg shadow-lg hover:scale-105 transition-transform">
+            <Button variant="ghost">Home</Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                push("/travel");
+              }}
+            >
+              Travel
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                push("/Custom-Trip");
+              }}
+            >
+              Custom Trip
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="p-8 flex justify-center">
-        <Input
-          type="text"
-          placeholder="Search for a city or trip..."
-          className="w-2/3 sm:w-1/2 border border-gray-300 rounded-full px-6 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-        />
+      <div>
+        <div>
+          Бид төлөвлөе, та аял — таны мөрөөдлийн аяллыг бид үнэ төлбөргүй
+          төлөвлөж өгье!
+        </div>
+        <input placeholder="Where you wanna go... " />
+        <select>
+          <option defaultValue="1">
+            Adult(12+)
+            <button onClick={plusPeople}>+</button>
+            <div>{count}</div>
+            <button>-</button>
+          </option>
+          <option>
+            <button onClick={() => {}}>+</button>
+            Child(2-11)
+            <button>-</button>
+          </option>
+          <option>
+            Newborn(0-1) <button onClick={() => {}}>+</button>
+            <button>-</button>
+          </option>
+        </select>
+        <button>Create</button>
       </div>
 
-      <div className="p-8">
-        <h2 className="text-2xl font-bold mb-6 text-gray-700">
-          Featured Trips
-        </h2>
-      </div>
-      <div className="p-8">
-        <div className="text-2xl font-bold mb-6 text-gray-700">Your Trips</div>
-      </div>
+      <FeaturedTrip />
+      <YourTrip />
     </div>
   );
 }

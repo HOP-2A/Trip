@@ -1,19 +1,19 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 export const Header = () => {
+  const { push } = useRouter();
   return (
-    <div className="fixed left-0 right-0 top-0 w-full z-1 ">
-      <div className="flex justify-around m-3">
-        <div className="flex justify-between w-70 font-semibold text-white">
-          <div className="border flex items-center px-3 rounded-lg shadow-lg hover:scale-125 transition-transform hover:cursor-pointer">
-            Home
-          </div>
-          <div className="border flex items-center px-3 rounded-lg shadow-lg hover:scale-125 transition-transform hover:cursor-pointer">
-            Trips
-          </div>
-          <div className="border flex items-center px-3 rounded-lg shadow-lg hover:scale-125 transition-transform  hover:cursor-pointer">
-            About us
-          </div>
+    <div>
+      <div className="fixed top-0 right-0 w-20 z-1">
+        <div
+          onClick={() => {
+            push("/login");
+          }}
+          className="border flex items-center px-3 rounded-lg shadow-lg hover:scale-125 transition-transform hover:cursor-pointer text-white "
+        >
+          Log In
         </div>
       </div>
     </div>
