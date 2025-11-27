@@ -15,6 +15,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 export default function Home() {
   const [count, setCount] = useState(0);
   const { push } = useRouter();
@@ -31,12 +38,12 @@ export default function Home() {
   };
   return (
     <div className="min-h-screen bg-gray-100 relative">
-      <Header />
       <div className="relative">
+        <Header />
         <img
           src={"/nature.jpg"}
           alt="Nature Photo"
-          className="w-full h-150 object-cover object-center"
+          className="w-full h-[600px] object-cover object-center"
         />
         <div className="flex flex-col gap-10 items-center justify-center absolute inset-0">
           <h1 className="text-white text-5xl font-extrabold text-center px-4">
