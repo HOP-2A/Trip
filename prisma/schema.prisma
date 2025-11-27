@@ -15,66 +15,88 @@ datasource db {
 }
 
 model User {
-  id             String  @id @default(nanoid())
-  name           String
-  email          String  @unique
-  password       String
-  profilePicture String?
+  id       String  @id @default(nanoid())
+  name     String?
+  email    String  @unique
+  password String
 
-  createdGroups TravelGroup[] @relation("GroupCreator")
-  memberships   GroupMember[]
-
-  createdAt DateTime @default(now())
+  customTrips CustomTrip[]
+  tripMembers TripMember[]
 }
 
-model TravelGroup {
-  id          String   @id @default(nanoid())
-  title       String
-  description String?
-  country     String
+model CustomTrip {
+  id          String    @id @default(nanoid())
+  startDate   DateTime?
+  endDate     DateTime?
+  peopleCount Int?
+  destination String
+  role        String    @default("owner")
+
+  images      String[]
+  createdById String?
+  createdBy   User?    @relation(fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
 
-  creatorId String
-  creator   User   @relation("GroupCreator", fields: [creatorId], references: [id])
-
-  members GroupMember[]
-
-  tripPlan TripPlan?
+  days         CustomTripDay[]
+  tripMember   TripMember?     @relation(fields: [tripMemberId], references: [id])
+  tripMemberId String?
 }
 
-model GroupMember {
-  id       String   @id @default(nanoid())
-  joinedAt DateTime @default(now())
+model CustomTripDay {
+  id           String  @id @default(nanoid())
+  customTripId String
+  dayNumber    Int
+  title        String?
+  description  String?
 
-  userId  String
-  groupId String
-
-  user  User        @relation(fields: [userId], references: [id])
-  group TravelGroup @relation(fields: [groupId], references: [id])
-
-  @@unique([userId, groupId])
+  activities CustomTripActivity[]
+  customTrip CustomTrip           @relation(fields: [customTripId], references: [id])
 }
 
-model TripPlan {
-  id        String   @id @default(nanoid())
-  totalDays Int
-  startDate DateTime
-  endDate   DateTime
-  createdAt DateTime @default(now())
+model CustomTripActivity {
+  id    String  @id @default(nanoid())
+  time  String?
+  title String
+  notes String?
+  dayId String
 
-  groupId String      @unique
-  group   TravelGroup @relation(fields: [groupId], references: [id])
-
-  dailyPlan TripActivity[]
+  day CustomTripDay @relation(fields: [dayId], references: [id])
 }
 
-model TripActivity {
-  id        String   @id @default(nanoid())
-  dayNumber Int
-  activity  String
-  notes     String?
-  createdAt DateTime @default(now())
+// model TripPlan {
+//   id           String    @id @default(nanoid())
+//   title        String
+//   startDate    DateTime?
+//   durationDays Int
 
-  tripPlanId String
-  tripPlan   TripPlan @relation(fields: [tripPlanId], references: [id])
+//   members    TripMember[]
+//   activities TripActivity[]
+//   images     String[]
+
+//   customTripId String?
+//   customTrip   CustomTrip? @relation(fields: [customTripId], references: [id])
+
+//   ownerId String
+//   owner   User   @relation(fields: [ownerId], references: [id])
+
+//   createdAt DateTime @default(now())
+// }
+
+// model TripActivity {
+//   id         String  @id @default(nanoid())
+//   tripPlanId String
+//   dayNumber  Int
+//   time       String?
+//   title      String
+//   notes      String?
+
+//   tripPlan TripPlan @relation(fields: [tripPlanId], references: [id])
+// }
+
+model TripMember {
+  id     String       @id @default(nanoid())
+  userId String
+  trip   CustomTrip[]
+
+  user User @relation(fields: [userId], references: [id])
 }
