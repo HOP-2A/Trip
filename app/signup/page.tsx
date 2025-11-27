@@ -30,19 +30,25 @@ const Page = () => {
   };
 
   return (
-    <div className="flex min-h-screen justify-center items-center flex-col gap-3">
-      <div className="border w-50 flex flex-col">
+    <div className="flex min-h-screen justify-center items-center flex-col gap-3 relative">
+      <img
+        src="/userNature.jpg"
+        className="absolute inset-0 w-full object-cover object-center h-full"
+      />
+      <div className="rounded-2xl gap-5 p-20 flex flex-col absolute text-white bg-gray-400/50">
         <Input
           name="name"
           placeholder="username here..."
           value={userSignUp.name}
           onChange={handleChange}
+          className="bg-white"
         />
         <Input
           name="email"
           placeholder="email here..."
           value={userSignUp.email}
           onChange={handleChange}
+          className="bg-white"
         />
         <Input
           name="password"
@@ -50,15 +56,16 @@ const Page = () => {
           placeholder="password here..."
           value={userSignUp.password}
           onChange={handleChange}
+          className="bg-white"
         />
         <Button variant="secondary" onClick={handleSignUp}>
           Sign up
         </Button>
-      </div>
-      <div className="flex flex-col items-center">
-        Already have an account?
-        <div className="text-blue-400" onClick={() => push("login")}>
-          Log in
+        <div className="flex flex-col items-center text-black">
+          Already have an account?
+          <div className="text-blue-400" onClick={() => push("login")}>
+            Log in
+          </div>
         </div>
       </div>
     </div>
