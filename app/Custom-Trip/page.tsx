@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Header } from "../_components/Header";
-import { Calendar2 } from "../../components/ui/Calender";
+import { Calendar05 } from "../_components/Calender";
 import {
   Select,
   SelectContent,
@@ -14,12 +14,17 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Dialog } from "../_components/Dialog";
 import { ChangeEvent, useState } from "react";
+import { DateRange } from "react-day-picker";
 const CustomTrip = () => {
-  const [inputValue, setInputValue] = useState("");
+  const [duration, setDuration] = useState<DateRange | undefined>();
+  console.log(duration);
+
+  const [inputValue, setInputValue] = useState({
+    input: "",
+    images: [],
+  });
   const { push } = useRouter();
-  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-  };
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {};
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
@@ -69,13 +74,14 @@ const CustomTrip = () => {
         <div className="flex justify-evenly">
           <Input
             placeholder="Where you wanna go... "
+            name="input"
             className="w-80"
-            value={inputValue}
+            value={inputValue.input}
             onChange={(e) => {
               handleInput(e);
             }}
           />
-          <Calendar2 />
+          <Calendar05 onChange={setDuration} />
           <Select>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Adult" />
@@ -98,6 +104,15 @@ const CustomTrip = () => {
               </SelectItem>
             </SelectContent>
           </Select>
+          <Input
+            name="images"
+            placeholder="give us photo "
+            className="w-80"
+            value={inputValue.images}
+            onChange={(e) => {
+              handleInput(e);
+            }}
+          />
           <Button>Create</Button>
         </div>
         <Dialog />

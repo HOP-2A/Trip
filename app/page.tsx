@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { YourTrip } from "./_components/YourTrip";
 import { FeaturedTrip } from "./_components/FeaturedTrip";
 import { useState } from "react";
-import { Calendar2 } from "../components/ui/Calender";
+import { Calendar05 } from "./_components/Calender";
 import React from "react";
 import {
   Select,
@@ -70,7 +70,7 @@ export default function Home() {
       </div>
       <div className="flex justify-evenly">
         <Input placeholder="Where you wanna go... " className="w-80" />
-        <Calendar2 />
+        <Calendar05 />
         <Select>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Adult" />
@@ -93,23 +93,6 @@ export default function Home() {
             </SelectItem>
           </SelectContent>
         </Select>
-        {/* <select>
-          <option defaultValue="1">
-            Adult(12+)
-            <button>+</button>
-            <div>{count}</div>
-            <button>-</button>
-          </option>
-          <option>
-            <button>+</button>
-            Child(2-11)
-            <button>-</button>
-          </option>
-          <option>
-            Newborn(0-1) <button>+</button>
-            <button>-</button>
-          </option>
-        </select> */}
         <Button>Create</Button>
       </div>
 
