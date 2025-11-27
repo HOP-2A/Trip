@@ -17,14 +17,16 @@ import { ChangeEvent, useState } from "react";
 import { DateRange } from "react-day-picker";
 const CustomTrip = () => {
   const [duration, setDuration] = useState<DateRange | undefined>();
-  console.log(duration);
-
-  const [inputValue, setInputValue] = useState({
-    input: "",
-    images: [],
-  });
+  const [count, setCount] = useState<number>(0);
+  const [inputValue, setInputValue] = useState("");
   const { push } = useRouter();
-  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {};
+
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
+  console.log(duration?.from?.toISOString());
+
+  console.log(count);
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
@@ -76,7 +78,7 @@ const CustomTrip = () => {
             placeholder="Where you wanna go... "
             name="input"
             className="w-80"
-            value={inputValue.input}
+            value={inputValue}
             onChange={(e) => {
               handleInput(e);
             }}
@@ -88,31 +90,67 @@ const CustomTrip = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Adult">
-                Adult(12+)<button>+</button>
-                <div>0</div>
-                <button>-</button>
+                Adult(12+)
+                <div>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCount(count - 1);
+                    }}
+                  >
+                    -
+                  </Button>
+                  <div>{count}</div>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCount(count + 1);
+                    }}
+                  >
+                    +
+                  </Button>
+                </div>
               </SelectItem>
               <SelectItem value="Child">
-                Child(2-11)<button>+</button>
-                <div>0</div>
-                <button>-</button>
+                Child(2-11)
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount(count - 1);
+                  }}
+                >-</Button>
+                <div>{count}</div>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount(count + 1);
+                  }}
+                >
+                  +
+                </Button>
               </SelectItem>
               <SelectItem value="Newborn">
-                Newborn(0-1) <button>+</button>
-                <div>0</div>
-                <button>-</button>
+                Newborn(0-1)
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount(count - 1);
+                  }}
+                >
+                  -
+                </Button>
+                <div>{count}</div>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount(count + 1);
+                  }}
+                >
+                  +
+                </Button>
               </SelectItem>
             </SelectContent>
           </Select>
-          <Input
-            name="images"
-            placeholder="give us photo "
-            className="w-80"
-            value={inputValue.images}
-            onChange={(e) => {
-              handleInput(e);
-            }}
-          />
           <Button>Create</Button>
         </div>
         <Dialog />
