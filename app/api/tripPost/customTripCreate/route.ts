@@ -1,8 +1,16 @@
+import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export const POST = async (req: NextRequest, res: NextResponse) => {
+export const POST = async (req: NextRequest) => {
   const body = await req.json();
-  //haashaa,hezee,heden hun gedgiin avna
-  const { totaldays, startDate, endDate } = body;
-  //endees haashaa gedeg n avagdahgui baina
+  const { startDate, endDate, peopleCount, destination } = body;
+  const response = await prisma.customTrip.create({
+    data: {
+      startDate,
+      endDate,
+      peopleCount,
+      destination,
+    },
+  });
+  return NextResponse.json(response);
 };
