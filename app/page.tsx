@@ -15,13 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
+
 export default function Home() {
   const [count, setCount] = useState(0);
   const { push } = useRouter();
