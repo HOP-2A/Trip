@@ -2,29 +2,47 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "../_components/Header";
 import { Calendar05 } from "../_components/Calender";
+import { BringCustomTrip } from "../_components/BringCustomTrip";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Dialog } from "../_components/Dialog";
 import { ChangeEvent, useState } from "react";
 import { DateRange } from "react-day-picker";
+
 const CustomTrip = () => {
   const [duration, setDuration] = useState<DateRange | undefined>();
-  console.log(duration);
-
-  const [inputValue, setInputValue] = useState({
-    input: "",
-    images: [],
-  });
+  const [count, setCount] = useState<number>(0);
+  const [count2, setCount2] = useState<number>(0);
+  const [count3, setCount3] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
+  const [inputValue, setInputValue] = useState("");
   const { push } = useRouter();
-  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {};
+  const res = () => {
+    setTotal(count + count2 + count3);
+  };
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
+  const CustomTripCreate = async () => {
+    const response = await fetch("/api/trip/tripPost/customTrip", {
+      method: "POST",
+      body: JSON.stringify({
+        startDate: duration?.from?.toISOString(),
+        endDate: duration?.to?.toISOString(),
+        peopleCount: total,
+        destination: inputValue,
+      }),
+    });
+    const res = await response.json();
+    console.log(res);
+  };
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
@@ -76,44 +94,82 @@ const CustomTrip = () => {
             placeholder="Where you wanna go... "
             name="input"
             className="w-80"
-            value={inputValue.input}
+            value={inputValue}
             onChange={(e) => {
               handleInput(e);
             }}
           />
           <Calendar05 onChange={setDuration} />
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Adult" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Adult">
-                Adult(12+)<button>+</button>
-                <div>0</div>
-                <button>-</button>
-              </SelectItem>
-              <SelectItem value="Child">
-                Child(2-11)<button>+</button>
-                <div>0</div>
-                <button>-</button>
-              </SelectItem>
-              <SelectItem value="Newborn">
-                Newborn(0-1) <button>+</button>
-                <div>0</div>
-                <button>-</button>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Input
-            name="images"
-            placeholder="give us photo "
-            className="w-80"
-            value={inputValue.images}
-            onChange={(e) => {
-              handleInput(e);
+
+          <Popover>
+            <PopoverTrigger>open</PopoverTrigger>
+            <PopoverContent>
+              <div>
+                Том хүн (12+) нас
+                <div>
+                  <Button
+                    onClick={() => {
+                      setCount(count + 1);
+                    }}
+                  >
+                    +
+                  </Button>
+                  {count}
+                  <Button
+                    onClick={() => {
+                      setCount(count - 1);
+                    }}
+                  >
+                    -
+                  </Button>
+                </div>
+              </div>
+              <div>
+                Хүүхэд (2-11) нас
+                <Button
+                  onClick={() => {
+                    setCount2(count2 + 1);
+                  }}
+                >
+                  +
+                </Button>
+                {count2}
+                <Button
+                  onClick={() => {
+                    setCount3(count3 - 1);
+                  }}
+                >
+                  -
+                </Button>
+              </div>
+              <div>
+                Нярай (0-1) нас
+                <Button
+                  onClick={() => {
+                    setCount3(count3 + 1);
+                  }}
+                >
+                  +
+                </Button>
+                {count3}
+                <Button
+                  onClick={() => {
+                    setCount3(count3 - 1);
+                  }}
+                >
+                  -
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Button
+            onClick={() => {
+              CustomTripCreate();
             }}
-          />
-          <Button>Create</Button>
+          >
+            Create
+          </Button>
+          {/* <BringCustomTrip /> */}
         </div>
         <Dialog />
       </div>
