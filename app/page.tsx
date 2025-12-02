@@ -18,7 +18,7 @@ export default function Home() {
   };
   return (
     <div className="min-h-screen bg-gray-100 relative">
-      <div className="">
+      <div className="relative">
         <Header />
         <img
           src={"/nature.jpg"}
@@ -51,11 +51,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div>
-        Бид төлөвлөе, та аял — таны мөрөөдлийн аяллыг бид үнэ төлбөргүй төлөвлөж
-        өгье!
-      </div>
-      <div className="flex justify-evenly">
+9      <div className="flex justify-evenly">
         <Input
           placeholder="Where you wanna go... "
           name="input"
@@ -67,7 +63,7 @@ export default function Home() {
         />
         <Calendar05 onChange={setDuration} />
 
-        <Button>Create</Button>
+        <Button>search</Button>
       </div>
 
       <FeaturedTrip />
