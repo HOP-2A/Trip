@@ -21,6 +21,7 @@ model User {
   password String
 
   customTrips CustomTrip[]
+  trips       TripPlan[]
   tripMembers TripMember[]
 }
 
@@ -63,40 +64,35 @@ model CustomTripActivity {
   day CustomTripDay @relation(fields: [dayId], references: [id])
 }
 
-// model TripPlan {
-//   id           String    @id @default(nanoid())
-//   title        String
-//   startDate    DateTime?
-//   durationDays Int
+model TripPlan {
+  id           String    @id @default(nanoid())
+  title        String
+  startDate    DateTime?
+  durationDays Int
 
-//   members    TripMember[]
-//   activities TripActivity[]
-//   images     String[]
+  activities TripActivity[]
+  images     String[]
 
-//   customTripId String?
-//   customTrip   CustomTrip? @relation(fields: [customTripId], references: [id])
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [traveler], references: [id])
+  traveler  String?
+}
 
-//   ownerId String
-//   owner   User   @relation(fields: [ownerId], references: [id])
+model TripActivity {
+  id         String  @id @default(nanoid())
+  tripPlanId String
+  dayNumber  Int
+  time       String?
+  title      String
+  notes      String?
 
-//   createdAt DateTime @default(now())
-// }
-
-// model TripActivity {
-//   id         String  @id @default(nanoid())
-//   tripPlanId String
-//   dayNumber  Int
-//   time       String?
-//   title      String
-//   notes      String?
-
-//   tripPlan TripPlan @relation(fields: [tripPlanId], references: [id])
-// }
+  tripPlan TripPlan @relation(fields: [tripPlanId], references: [id])
+}
 
 model TripMember {
-  id     String       @id @default(nanoid())
+  id     String @id @default(nanoid())
   userId String
-  trip   CustomTrip[]
 
-  user User @relation(fields: [userId], references: [id])
+  customTrips CustomTrip[]
+  user        User         @relation(fields: [userId], references: [id])
 }
