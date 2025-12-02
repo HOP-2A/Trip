@@ -2,31 +2,47 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "../_components/Header";
 import { Calendar05 } from "../_components/Calender";
+import { BringCustomTrip } from "../_components/BringCustomTrip";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Dialog } from "../_components/Dialog";
 import { ChangeEvent, useState } from "react";
 import { DateRange } from "react-day-picker";
+
 const CustomTrip = () => {
   const [duration, setDuration] = useState<DateRange | undefined>();
   const [count, setCount] = useState<number>(0);
+  const [count2, setCount2] = useState<number>(0);
+  const [count3, setCount3] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
   const [inputValue, setInputValue] = useState("");
   const { push } = useRouter();
-
+  const res = () => {
+    setTotal(count + count2 + count3);
+  };
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
-  console.log(duration?.from?.toISOString());
+  const CustomTripCreate = async () => {
+    const response = await fetch("/api/trip/tripPost/customTrip", {
+      method: "POST",
+      body: JSON.stringify({
+        startDate: duration?.from?.toISOString(),
+        endDate: duration?.to?.toISOString(),
+        peopleCount: total,
+        destination: inputValue,
+      }),
+    });
+    const res = await response.json();
+    console.log(res);
+  };
 
-  console.log(count);
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
@@ -84,74 +100,76 @@ const CustomTrip = () => {
             }}
           />
           <Calendar05 onChange={setDuration} />
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Adult" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Adult">
-                Adult(12+)
+
+          <Popover>
+            <PopoverTrigger>open</PopoverTrigger>
+            <PopoverContent>
+              <div>
+                Том хүн (12+) нас
                 <div>
                   <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setCount(count - 1);
-                    }}
-                  >
-                    -
-                  </Button>
-                  <div>{count}</div>
-                  <Button
-                    variant="ghost"
                     onClick={() => {
                       setCount(count + 1);
                     }}
                   >
                     +
                   </Button>
+                  {count}
+                  <Button
+                    onClick={() => {
+                      setCount(count - 1);
+                    }}
+                  >
+                    -
+                  </Button>
                 </div>
-              </SelectItem>
-              <SelectItem value="Child">
-                Child(2-11)
+              </div>
+              <div>
+                Хүүхэд (2-11) нас
                 <Button
-                  variant="ghost"
                   onClick={() => {
-                    setCount(count - 1);
-                  }}
-                >-</Button>
-                <div>{count}</div>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setCount(count + 1);
+                    setCount2(count2 + 1);
                   }}
                 >
                   +
                 </Button>
-              </SelectItem>
-              <SelectItem value="Newborn">
-                Newborn(0-1)
+                {count2}
                 <Button
-                  variant="ghost"
                   onClick={() => {
-                    setCount(count - 1);
+                    setCount3(count3 - 1);
                   }}
                 >
                   -
                 </Button>
-                <div>{count}</div>
+              </div>
+              <div>
+                Нярай (0-1) нас
                 <Button
-                  variant="ghost"
                   onClick={() => {
-                    setCount(count + 1);
+                    setCount3(count3 + 1);
                   }}
                 >
                   +
                 </Button>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Button>Create</Button>
+                {count3}
+                <Button
+                  onClick={() => {
+                    setCount3(count3 - 1);
+                  }}
+                >
+                  -
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Button
+            onClick={() => {
+              CustomTripCreate();
+            }}
+          >
+            Create
+          </Button>
+          {/* <BringCustomTrip /> */}
         </div>
         <Dialog />
       </div>
