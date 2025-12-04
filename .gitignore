@@ -45,3 +45,6 @@ next-env.d.ts
 /generated/client
 /app/generated/prisma
 .env*.local
+
+# clerk configuration (can include secrets)
+/.clerk/
