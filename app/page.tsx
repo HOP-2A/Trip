@@ -51,7 +51,7 @@ export default function Home() {
         </div>
       </div>
 
-9      <div className="flex justify-evenly">
+      <div className="flex justify-evenly">
         <Input
           placeholder="Where you wanna go... "
           name="input"
