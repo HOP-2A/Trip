@@ -1,9 +1,10 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
+import { UserJSON, UserWebhookEvent } from "@clerk/nextjs/server";
 
 export async function POST(req: Request) {
-  const WH_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+  const WH_SECRET = process.env.WH_SECRET;
   if (!WH_SECRET) throw new Error("Missing CLERK_WEBHOOK_SECRET");
 
   const payload = await req.text();
@@ -19,27 +20,24 @@ export async function POST(req: Request) {
   let evt;
 
   try {
-    evt = wh.verify(payload, svixHeaders);
+    evt = wh.verify(payload, svixHeaders) as UserWebhookEvent;
   } catch {
     return new Response("Invalid signature", { status: 400 });
   }
 
   const eventType = evt.type;
-  const user = evt.data;
+  const user = evt.data as UserJSON;
 
   const email = user.email_addresses?.[0]?.email_address ?? null;
-  const phoneNumber = user.phone_numbers?.[0]?.phone_number ?? null;
-  const firstName = user.first_name || "";
+  const name = user.first_name || "";
+  console.log(user);
 
   if (eventType === "user.created") {
-    await prisma.childProfile.upsert({
-      where: { clerkId: user.id },
-      update: {},
-      create: {
+    await prisma.user.create({
+      data: {
         clerkId: user.id,
         email,
-        phoneNumber,
-        firstName,
+        name,
       },
     });
   }
