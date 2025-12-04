@@ -2,21 +2,19 @@ import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
-  const body = await req.json();
-  const { startDate, endDate, peopleCount, destination, title } = body;
-  const response = await prisma.customTrip.create({
+  const { dayNumber, title, description, customTripId } = await req.json();
+  const response = await prisma.customTripDay.create({
     data: {
-      startDate,
-      endDate,
-      peopleCount,
-      destination,
+      dayNumber,
       title,
+      description,
+      customTripId,
     },
   });
   return NextResponse.json(response);
 };
 
 export const GET = async (req: NextRequest) => {
-  const response = await prisma.customTrip.findMany({});
+  const response = await prisma.customTripDay.findMany({});
   return NextResponse.json(response);
 };
