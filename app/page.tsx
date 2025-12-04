@@ -16,6 +16,7 @@ export default function Home() {
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
+
   return (
     <div className="min-h-screen bg-gray-100 relative">
       <div className="relative">
