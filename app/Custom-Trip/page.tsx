@@ -108,56 +108,62 @@ const CustomTrip = () => {
                 Том хүн (12+) нас
                 <div>
                   <Button
-                    onClick={() => {
-                      setCount(count + 1);
-                    }}
-                  >
-                    +
-                  </Button>
-                  {count}
-                  <Button
+                    variant="ghost"
                     onClick={() => {
                       setCount(count - 1);
                     }}
                   >
                     -
                   </Button>
+                  {count}
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCount(count + 1);
+                    }}
+                  >
+                    +
+                  </Button>
                 </div>
               </div>
               <div>
                 Хүүхэд (2-11) нас
                 <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount2(count2 - 1);
+                  }}
+                >
+                  -
+                </Button>
+                {count2}
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     setCount2(count2 + 1);
                   }}
                 >
                   +
                 </Button>
-                {count2}
+              </div>
+              <div>
+                Нярай (0-1) нас
                 <Button
+                  variant="ghost"
                   onClick={() => {
                     setCount3(count3 - 1);
                   }}
                 >
                   -
                 </Button>
-              </div>
-              <div>
-                Нярай (0-1) нас
+                {count3}
                 <Button
+                  variant="ghost"
                   onClick={() => {
                     setCount3(count3 + 1);
                   }}
                 >
                   +
-                </Button>
-                {count3}
-                <Button
-                  onClick={() => {
-                    setCount3(count3 - 1);
-                  }}
-                >
-                  -
                 </Button>
               </div>
             </PopoverContent>

@@ -4,31 +4,17 @@ import { Header } from "./_components/Header";
 import { useRouter } from "next/navigation";
 import { YourTrip } from "./_components/YourTrip";
 import { FeaturedTrip } from "./_components/FeaturedTrip";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Calendar05 } from "./_components/Calender";
-import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { DateRange } from "react-day-picker";
 import { Input } from "@/components/ui/input";
 
 export default function Home() {
-  const [count, setCount] = useState(0);
   const { push } = useRouter();
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [calendar, setCalender] = useState<boolean>(false);
-
-  const plusPeople = () => {
-    let amount: number = 0;
-    amount = amount + 1;
-    setCount(amount);
-  };
-  const func = () => {
-    setCalender(true);
+  const [duration, setDuration] = useState<DateRange | undefined>();
+  const [inputValue, setInputValue] = useState("");
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
   };
   return (
     <div className="min-h-screen bg-gray-100 relative">
@@ -65,36 +51,19 @@ export default function Home() {
         </div>
       </div>
 
-      <div>
-        Бид төлөвлөе, та аял — таны мөрөөдлийн аяллыг бид үнэ төлбөргүй төлөвлөж
-        өгье!
-      </div>
       <div className="flex justify-evenly">
-        <Input placeholder="Where you wanna go... " className="w-80" />
-        <Calendar05 />
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Adult" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Adult">
-              Adult<button>+</button>
-              <div>0</div>
-              <button>-</button>
-            </SelectItem>
-            <SelectItem value="Child">
-              Child<button>+</button>
-              <div>0</div>
-              <button>-</button>
-            </SelectItem>
-            <SelectItem value="Newborn">
-              Newborn <button>+</button>
-              <div>0</div>
-              <button>-</button>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-        <Button>Create</Button>
+        <Input
+          placeholder="Where you wanna go... "
+          name="input"
+          className="w-80"
+          value={inputValue}
+          onChange={(e) => {
+            handleInput(e);
+          }}
+        />
+        <Calendar05 onChange={setDuration} />
+
+        <Button>search</Button>
       </div>
 
       <FeaturedTrip />
