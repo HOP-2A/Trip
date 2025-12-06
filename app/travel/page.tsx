@@ -12,7 +12,7 @@ export default function FeaturedTrips() {
   useEffect(() => {
     async function loadTrips() {
       try {
-        const res = await fetch("api/allTripsGet");
+        const res = await fetch("api/trip/tripGet/allTripsGet");
         const data = await res.json();
         setTrips(data);
       } catch (err) {
@@ -36,7 +36,7 @@ export default function FeaturedTrips() {
           <h1 className="text-white text-5xl font-extrabold text-center px-4">
             Plan Your Next Adventure
           </h1>
-          <div className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold  rounded-lg shadow-lg hover:scale-105 transition-transform">
+          <div className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold rounded-lg shadow-lg transition-transform">
             <Button
               variant="ghost"
               onClick={() => {
@@ -82,14 +82,8 @@ export default function FeaturedTrips() {
                 <h3 className="font-semibold text-lg leading-snug">
                   {trip.title}
                 </h3>
-
                 <div className="text-sm text-gray-600">{trip.startDate}</div>
-
                 <div className="text-sm text-gray-600">{trip.duration}</div>
-
-                {/* <div className="text-green-600 font-bold text-lg">
-                ₮ {trip.price.toLocaleString()}
-              </div> */}
               </div>
             </div>
           ))}

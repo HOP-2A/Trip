@@ -2,20 +2,37 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "./_components/Header";
 import { useRouter } from "next/navigation";
-import { YourTrip } from "./_components/YourTrip";
 import { FeaturedTrip } from "./_components/FeaturedTrip";
-import { ChangeEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar05 } from "./_components/Calender";
 import { DateRange } from "react-day-picker";
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 export default function Home() {
   const { push } = useRouter();
   const [duration, setDuration] = useState<DateRange | undefined>();
   const [inputValue, setInputValue] = useState("");
-  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
+  const [selectedDestination, setSelectedDestination] = useState(null);
+  const [destination, setDestination] = useState([]);
+
+  const getDestinations = async () => {
+    const res = await fetch("/api/trip/tripGet/allTripsGet");
+    const data = await res.json();
+    setDestination(data);
   };
+
+  const searchForTrips = () => {
+    fetch(``);
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    getDestinations();
+  }, []);
+
+  console.log(destination);
 
   return (
     <div className="min-h-screen bg-gray-100 relative">
@@ -30,7 +47,7 @@ export default function Home() {
           <h1 className="text-white text-5xl font-extrabold text-center px-4">
             Plan Your Next Adventure
           </h1>
-          <div className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold  rounded-lg shadow-lg hover:scale-105 transition-transform">
+          <div className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold rounded-lg shadow-lg transition-transform">
             <Button variant="ghost">Home</Button>
             <Button
               variant="ghost"
@@ -52,23 +69,28 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex justify-evenly">
-        <Input
-          placeholder="Where you wanna go... "
-          name="input"
-          className="w-80"
-          value={inputValue}
-          onChange={(e) => {
-            handleInput(e);
-          }}
-        />
-        <Calendar05 onChange={setDuration} />
+      <div className="flex justify-center">
+        <div className="flex items-center w-[600px] py-5 border justify-around">
+          <Input
+            placeholder="Where you wanna go... "
+            name="input"
+            className="w-80"
+            value={inputValue}
+            onClick={() => setIsSearchDropdownOpen(true)}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setIsSearchDropdownOpen(true);
+            }}
+          />
 
-        <Button>search</Button>
+          <Calendar05 onChange={setDuration} />
+
+          <div>
+            <Search />
+          </div>
+        </div>
       </div>
-
       <FeaturedTrip />
-      <YourTrip />
     </div>
   );
 }
