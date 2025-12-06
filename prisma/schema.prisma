@@ -56,7 +56,7 @@ model TripMember {
 
 model CustomTripDay {
   id           String  @id @default(nanoid())
-  customTripId String
+  customTripId String 
   dayNumber    Int
   title        String?
   description  String?

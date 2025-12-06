@@ -64,7 +64,6 @@ const CustomTrip = () => {
   useEffect(() => {
     BringCustomTrip();
   }, []);
-
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
@@ -209,17 +208,29 @@ const CustomTrip = () => {
           {/* <BringCustomTrip /> */}
         </div>
         <Dialog />
-        <div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           tanii buteesen aylal:
           {bringData.map((bring) => {
             return (
-              <div key={bring.id}>
+              <div
+                key={bring.id}
+                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+              >
                 <div>
-                  {bring.title}
-                  {bring.endDate}
-                  {bring.peopleCount}
-                  {bring.destination}
-                  {bring.id}
+                  <div
+                    onClick={() => {
+                      push(`/Custom-Trip/${bring.id}`);
+                    }}
+                    className="p-4 space-y-2"
+                  >
+                    <h3 className="font-semibold text-lg leading-snug">
+                      {bring.title}
+                    </h3>
+                    <div className="text-sm text-gray-600">
+                      {bring.startDate}
+                    </div>
+                    <div className="text-sm text-gray-600">{bring.endDate}</div>
+                  </div>
                 </div>
               </div>
             );
