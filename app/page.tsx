@@ -63,7 +63,6 @@ export default function Home() {
           }}
         />
         <Calendar05 onChange={setDuration} />
-
         <Button>search</Button>
       </div>
 

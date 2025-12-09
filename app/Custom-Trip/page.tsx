@@ -12,23 +12,35 @@ import {
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Dialog } from "../_components/Dialog";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
+type CustomTripType = {
+  id: string;
+  startDate: string;
+  endDate: string;
+  peopleCount: number;
+  destination: string;
+  title: string;
+};
 
 const CustomTrip = () => {
   const [duration, setDuration] = useState<DateRange | undefined>();
-  const [count, setCount] = useState<number>(0);
+  const [count, setCount] = useState<number>(1);
   const [count2, setCount2] = useState<number>(0);
   const [count3, setCount3] = useState<number>(0);
-  const [total, setTotal] = useState<number>(0);
   const [inputValue, setInputValue] = useState("");
+  const [inputValue2, setInputValue2] = useState("");
+  const [bringData, setBringData] = useState<CustomTripType[]>([]);
   const { push } = useRouter();
-  const res = () => {
-    setTotal(count + count2 + count3);
-  };
+
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
+  const handleInput2 = (event: ChangeEvent<HTMLInputElement>) => {
+    setInputValue2(event.target.value);
+  };
+  const total = count + count2 + count3;
+
   const CustomTripCreate = async () => {
     const response = await fetch("/api/trip/tripPost/customTrip", {
       method: "POST",
@@ -37,12 +49,21 @@ const CustomTrip = () => {
         endDate: duration?.to?.toISOString(),
         peopleCount: total,
         destination: inputValue,
+        title: inputValue2,
       }),
     });
     const res = await response.json();
-    console.log(res);
   };
-
+  const BringCustomTrip = async () => {
+    const response = await fetch("/api/trip/tripPost/customTrip", {
+      method: "GET",
+    });
+    const data = await response.json();
+    setBringData(data);
+  };
+  useEffect(() => {
+    BringCustomTrip();
+  }, []);
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
@@ -90,6 +111,15 @@ const CustomTrip = () => {
           төлөвлөж өгье!
         </div>
         <div className="flex justify-evenly">
+          <Input
+            placeholder="Aylah gazra nerlene uu"
+            name="input"
+            className="w-80"
+            value={inputValue2}
+            onChange={(e) => {
+              handleInput2(e);
+            }}
+          />
           <Input
             placeholder="Where you wanna go... "
             name="input"
@@ -178,6 +208,34 @@ const CustomTrip = () => {
           {/* <BringCustomTrip /> */}
         </div>
         <Dialog />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          tanii buteesen aylal:
+          {bringData.map((bring) => {
+            return (
+              <div
+                key={bring.id}
+                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+              >
+                <div>
+                  <div
+                    onClick={() => {
+                      push(`/Custom-Trip/${bring.id}`);
+                    }}
+                    className="p-4 space-y-2"
+                  >
+                    <h3 className="font-semibold text-lg leading-snug">
+                      {bring.title}
+                    </h3>
+                    <div className="text-sm text-gray-600">
+                      {bring.startDate}
+                    </div>
+                    <div className="text-sm text-gray-600">{bring.endDate}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
