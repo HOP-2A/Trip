@@ -12,7 +12,9 @@ export default function FeaturedTrips() {
   useEffect(() => {
     async function loadTrips() {
       try {
-        const res = await fetch("api/allTripsGet");
+        const res = await fetch("api/allTripsGet"
+          
+        );
         const data = await res.json();
         setTrips(data);
       } catch (err) {
