@@ -105,7 +105,7 @@ const CustomTrip = () => {
         <Header />
         <div className="relative">
           <img
-            src={"/custom.jpg"}
+            src={"https://i.pinimg.com/1200x/0f/47/dd/0f47dd86b8da636abcf96b72419837b0.jpg"}
             alt="Nature Photo"
             className="w-full h-150 object-cover object-center"
           />

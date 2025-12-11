@@ -27,7 +27,7 @@ export default function FeaturedTrips() {
       <div className="relative">
         <Header />
         <img
-          src={"/nature.jpg"}
+          src={"https://images.unsplash.com/photo-1684863941689-2962fb53bc0e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHRyYXZlbCUyMGFlc3RoZXRpY3xlbnwwfHwwfHx8MA%3D%3D"}
           alt="Nature Photo"
           className="w-full h-[600px] object-cover object-center"
         />

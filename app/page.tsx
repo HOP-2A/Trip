@@ -41,9 +41,9 @@ export default function Home() {
       <div className="relative">
         <Header />
         <img
-          src={"/nature.jpg"}
-          alt="Nature Photo"
-          className="w-full h-[600px] object-cover object-center"
+             src={"https://i.pinimg.com/1200x/c3/ba/f8/c3baf81065ceb01e904ede118ef89bd3.jpg"}
+             alt="Nature Photo"
+          className="w-full h-[720px] bg-cover bg-center bg-no-repeat"
         />
         <div className="flex flex-col gap-10 items-center justify-center absolute inset-0">
           <h1 className="text-white text-5xl font-extrabold text-center px-4">
