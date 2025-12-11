@@ -43,19 +43,6 @@ const CustomTrip = () => {
 
   const total = count + count2 + count3;
 
-  const CustomTripCreate = async () => {
-    const response = await fetch("/api/trip/tripPost/customTrip", {
-      method: "POST",
-      body: JSON.stringify({
-        startDate: duration?.from?.toISOString(),
-        endDate: duration?.to?.toISOString(),
-        peopleCount: total,
-        destination: prompt,
-        images: imageUrl,
-      }),
-    });
-    const res = await response.json();
-  };
   const BringCustomTrip = async () => {
     const response = await fetch("/api/trip/tripPost/customTrip", {
       method: "GET",
@@ -88,6 +75,19 @@ const CustomTrip = () => {
     } catch (error) {
       setIsLoading(false);
     }
+  };
+  const CustomTripCreate = async () => {
+    const response = await fetch("/api/trip/tripPost/customTrip", {
+      method: "POST",
+      body: JSON.stringify({
+        startDate: duration?.from?.toISOString(),
+        endDate: duration?.to?.toISOString(),
+        peopleCount: total,
+        destination: prompt,
+        images: imageUrl,
+      }),
+    });
+    const res = await response.json();
   };
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -222,8 +222,8 @@ const CustomTrip = () => {
           </Popover>
           <Button
             onClick={() => {
-              CustomTripCreate();
               generateImage();
+              CustomTripCreate();
             }}
           >
             Create
@@ -262,6 +262,22 @@ const CustomTrip = () => {
           })}
         </div>
       </div>
+      {imageUrl && (
+        <div>
+          <div className="text-xl font-semibold text-gray-800">
+            Your generated Image
+          </div>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            {imageUrl.map((url) => (
+              <img
+                key={url}
+                className="w-full h-auto rounded-lg shadow-md "
+                src={url}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
