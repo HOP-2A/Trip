@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "../_components/Header";
 import { Calendar05 } from "../_components/Calender";
-import { BringCustomTrip } from "../_components/BringCustomTrip";
 import {
   Popover,
   PopoverContent,
@@ -69,9 +68,12 @@ const CustomTrip = () => {
     const data = await response.json();
     setBringData(data);
   };
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     BringCustomTrip();
   }, []);
+
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
