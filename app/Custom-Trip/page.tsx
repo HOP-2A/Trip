@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "../_components/Header";
 import { Calendar05 } from "../_components/Calender";
+import { upload } from "@vercel/blob/client";
 import {
   Popover,
   PopoverContent,
@@ -22,6 +23,7 @@ type CustomTripType = {
   peopleCount: number;
   destination: string;
   title: string;
+  images: string[];
 };
 
 const CustomTrip = () => {
@@ -29,38 +31,18 @@ const CustomTrip = () => {
   const [count, setCount] = useState<number>(1);
   const [count2, setCount2] = useState<number>(0);
   const [count3, setCount3] = useState<number>(0);
-  const [inputValue, setInputValue] = useState("");
-  const [inputValue2, setInputValue2] = useState("");
+  const [imageUrl, setImageUrl] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [prompt, setPrompt] = useState("");
   const [bringData, setBringData] = useState<CustomTripType[]>([]);
   const { push } = useRouter();
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+    setPrompt(event.target.value);
   };
 
-  const { user: clerkUser } = useUser();
-  const { user } = useAuth(clerkUser?.id);
-
-  console.log(user);
-  const handleInput2 = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputValue2(event.target.value);
-  };
   const total = count + count2 + count3;
 
-  const CustomTripCreate = async () => {
-    const response = await fetch("/api/trip/tripPost/customTrip", {
-      method: "POST",
-      body: JSON.stringify({
-        startDate: duration?.from?.toISOString(),
-        endDate: duration?.to?.toISOString(),
-        peopleCount: total,
-        destination: inputValue,
-        createdById: user,
-        title: inputValue2,
-      }),
-    });
-    const res = await response.json();
-  };
   const BringCustomTrip = async () => {
     const response = await fetch("/api/trip/tripPost/customTrip", {
       method: "GET",
@@ -68,7 +50,45 @@ const CustomTrip = () => {
     const data = await response.json();
     setBringData(data);
   };
+  const generateImage = async () => {
+    if (!prompt.trim()) return;
+    setIsLoading(true);
 
+    try {
+      const response = await fetch("/api/images/generate", {
+        method: "POST",
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate");
+
+      const blob = await response.blob();
+
+      const file = new File([blob], "generated.png", { type: "image/png" });
+
+      const uploaded = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/images/upload",
+      });
+      setImageUrl((prev) => [...prev, uploaded.url]);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
+  const CustomTripCreate = async () => {
+    const response = await fetch("/api/trip/tripPost/customTrip", {
+      method: "POST",
+      body: JSON.stringify({
+        startDate: duration?.from?.toISOString(),
+        endDate: duration?.to?.toISOString(),
+        peopleCount: total,
+        destination: prompt,
+        images: imageUrl,
+      }),
+    });
+    const res = await response.json();
+  };
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     BringCustomTrip();
@@ -122,150 +142,142 @@ const CustomTrip = () => {
         </div>
         <div className="flex justify-evenly">
           <Input
-            placeholder="Aylah gazra nerlene uu"
-            name="input"
-            className="w-80"
-            value={inputValue2}
-            onChange={(e) => {
-              handleInput2(e);
-            }}
-          />
-          <Input
             placeholder="Where you wanna go... "
             name="input"
             className="w-80"
-            value={inputValue}
             onChange={(e) => {
               handleInput(e);
             }}
+            value={prompt}
+            disabled={isLoading}
           />
           <Calendar05 onChange={setDuration} />
 
-          <div className="flex justify-center">
-            <div className="flex items-center w-[600px] py-5 border justify-around">
-              <Input
-                placeholder="Where you wanna go... "
-                name="input"
-                className="w-80"
-                value={inputValue}
-                onChange={(e) => {
-                  handleInput(e);
-                }}
-              />
-              <Calendar05 onChange={setDuration} />
-
-              <Popover>
-                <PopoverTrigger>Open</PopoverTrigger>
-                <PopoverContent>
-                  <div>
-                    Том хүн (12+) нас
-                    <div>
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          setCount(count - 1);
-                        }}
-                      >
-                        -
-                      </Button>
-                      {count}
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          setCount(count + 1);
-                        }}
-                      >
-                        +
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
-                    Хүүхэд (2-11) нас
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setCount2(count2 - 1);
-                      }}
-                    >
-                      -
-                    </Button>
-                    {count2}
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setCount2(count2 + 1);
-                      }}
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <div>
-                    Нярай (0-1) нас
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setCount3(count3 - 1);
-                      }}
-                    >
-                      -
-                    </Button>
-                    {count3}
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setCount3(count3 + 1);
-                      }}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <Button
-                variant="ghost"
-                className="border"
-                onClick={() => {
-                  CustomTripCreate();
-                }}
-              >
-                Create
-              </Button>
-              {/* <BringCustomTrip /> */}
-            </div>
-          </div>
-          <Dialog />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            tanii buteesen aylal:
-            {bringData.map((bring) => {
-              return (
-                <div
-                  key={bring.id}
-                  className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+          <Popover>
+            <PopoverTrigger>open</PopoverTrigger>
+            <PopoverContent>
+              <div>
+                Том хүн (12+) нас
+                <div>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCount(count - 1);
+                    }}
+                  >
+                    -
+                  </Button>
+                  {count}
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCount(count + 1);
+                    }}
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+              <div>
+                Хүүхэд (2-11) нас
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount2(count2 - 1);
+                  }}
                 >
-                  <div>
-                    <div
-                      onClick={() => {
-                        push(`/Custom-Trip/${bring.id}`);
-                      }}
-                      className="p-4 space-y-2"
-                    >
-                      <h3 className="font-semibold text-lg leading-snug">
-                        {bring.title}
-                      </h3>
-                      <div className="text-sm text-gray-600">
-                        {bring.startDate}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {bring.endDate}
-                      </div>
+                  -
+                </Button>
+                {count2}
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount2(count2 + 1);
+                  }}
+                >
+                  +
+                </Button>
+              </div>
+              <div>
+                Нярай (0-1) нас
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount3(count3 - 1);
+                  }}
+                >
+                  -
+                </Button>
+                {count3}
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount3(count3 + 1);
+                  }}
+                >
+                  +
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Button
+            onClick={() => {
+              generateImage();
+              CustomTripCreate();
+            }}
+          >
+            Create
+          </Button>
+        </div>
+        <Dialog />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {bringData.map((bring) => {
+            return (
+              <div
+                key={bring.id}
+                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+              >
+                <img
+                  src={bring.images[0]}
+                  alt={bring.title}
+                  className="w-full h-40 object-cover"
+                />
+                <div>
+                  <div
+                    onClick={() => {
+                      push(`/Custom-Trip/${bring.id}`);
+                    }}
+                    className="p-4 space-y-2"
+                  >
+                    <h3 className="font-semibold text-lg leading-snug">
+                      {bring.title}
+                    </h3>
+                    <div className="text-sm text-gray-600">
+                      {bring.startDate}
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
+      {imageUrl && (
+        <div>
+          <div className="text-xl font-semibold text-gray-800">
+            Your generated Image
+          </div>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            {imageUrl.map((url) => (
+              <img
+                key={url}
+                className="w-full h-auto rounded-lg shadow-md "
+                src={url}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

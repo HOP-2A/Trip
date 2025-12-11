@@ -27,6 +27,9 @@ export const GET = async (
 
   const response = await prisma.customTripDay.findMany({
     where: { customTripId },
+    include: {
+      customTrip: true,
+    },
   });
 
   return NextResponse.json(response);
