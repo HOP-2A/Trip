@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { Dialog } from "../_components/Dialog";
 import { ChangeEvent, useState } from "react";
 import { DateRange } from "react-day-picker";
+import { useAuth } from "@/hooks/use-auth";
+import { useUser } from "@clerk/nextjs";
 
 const CustomTrip = () => {
   const [duration, setDuration] = useState<DateRange | undefined>();
@@ -29,6 +31,12 @@ const CustomTrip = () => {
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
+
+  const { user: clerkUser } = useUser();
+  const { user } = useAuth(clerkUser?.id);
+
+  console.log(user);
+
   const CustomTripCreate = async () => {
     const response = await fetch("/api/trip/tripPost/customTrip", {
       method: "POST",
@@ -37,6 +45,7 @@ const CustomTrip = () => {
         endDate: duration?.to?.toISOString(),
         peopleCount: total,
         destination: inputValue,
+        createdById: user,
       }),
     });
     const res = await response.json();

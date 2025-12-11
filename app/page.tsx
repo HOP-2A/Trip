@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "./_components/Header";
 import { useRouter } from "next/navigation";
-import { FeaturedTrip } from "./_components/FeaturedTrip";
 import { useEffect, useState } from "react";
 import { Calendar05 } from "./_components/Calender";
 import { DateRange } from "react-day-picker";
@@ -15,24 +14,27 @@ export default function Home() {
   const [inputValue, setInputValue] = useState("");
   const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState(null);
-  const [destination, setDestination] = useState([]);
+  const [trips, setTrips] = useState([]);
 
-  const getDestinations = async () => {
-    const res = await fetch("/api/trip/tripGet/allTripsGet");
-    const data = await res.json();
-    setDestination(data);
-  };
+  useEffect(() => {
+    async function loadTrips() {
+      try {
+        const res = await fetch("api/trip/tripGet/allTripsGet");
+        const data = await res.json();
+        setTrips(data);
+      } catch (err) {
+        console.error("Failed to fetch trips:", err);
+      }
+    }
+
+    loadTrips();
+  }, []);
 
   const searchForTrips = () => {
     fetch(``);
   };
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    getDestinations();
-  }, []);
-
-  console.log(destination);
+  console.log(trips);
 
   return (
     <div className="min-h-screen bg-gray-100 relative">
@@ -90,7 +92,34 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <FeaturedTrip />
+
+      <div className="p-8">
+        <h2 className="text-2xl font-bold mb-6 text-gray-700">
+          Featured Trips
+        </h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {trips.slice(0, 4).map((trip) => (
+            <div
+              key={trip.id}
+              className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+            >
+              <img
+                src={trip.images}
+                alt={trip.title}
+                className="w-full h-40 object-cover"
+              />
+
+              <div className="p-4 space-y-2">
+                <h3 className="font-semibold text-lg leading-snug">
+                  {trip.title}
+                </h3>
+                <div className="text-sm text-gray-600">{trip.startDate}</div>
+                <div className="text-sm text-gray-600">{trip.duration}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
