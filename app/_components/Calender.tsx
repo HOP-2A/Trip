@@ -24,7 +24,7 @@ export function Calendar05({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline">Open popover</Button>
+        <Button variant="outline">Choose date</Button>
       </PopoverTrigger>
       <PopoverContent className="w-130">
         <Calendar

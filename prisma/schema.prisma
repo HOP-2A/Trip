@@ -17,7 +17,7 @@ datasource db {
 model User {
   id          String       @id @default(nanoid())
   name        String?
-  email       String       @unique
+  email       String?      @unique
   clerkId     String       @unique
   customTrips CustomTrip[]
   trips       TripPlan[]
@@ -26,7 +26,6 @@ model User {
 
 model CustomTrip {
   id          String    @id @default(nanoid())
-  title       String
   destination String
   startDate   DateTime?
   endDate     DateTime?
@@ -55,23 +54,12 @@ model TripMember {
 
 model CustomTripDay {
   id           String  @id @default(nanoid())
-  customTripId String 
+  customTripId String
   dayNumber    Int
   title        String?
   description  String?
 
-  activities CustomTripActivity[]
-  customTrip CustomTrip           @relation(fields: [customTripId], references: [id])
-}
-
-model CustomTripActivity {
-  id    String  @id @default(nanoid())
-  time  String?
-  title String
-  notes String?
-  dayId String
-
-  day CustomTripDay @relation(fields: [dayId], references: [id])
+  customTrip CustomTrip @relation(fields: [customTripId], references: [id])
 }
 
 model TripPlan {
@@ -95,18 +83,6 @@ model TripDay {
   title       String?
   description String?
 
-  activities TripActivity[]
-  tripPlan   TripPlan?      @relation(fields: [tripPlanId], references: [id])
+  tripPlan   TripPlan? @relation(fields: [tripPlanId], references: [id])
   tripPlanId String?
-}
-
-model TripActivity {
-  id        String  @id @default(nanoid())
-  dayNumber Int
-  time      String?
-  title     String
-  notes     String?
-
-  tripDay   TripDay? @relation(fields: [tripDayId], references: [id])
-  tripDayId String?
 }
