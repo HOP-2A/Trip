@@ -19,7 +19,6 @@ export default function FeaturedTrips() {
         console.error("Failed to fetch trips:", err);
       }
     }
-
     loadTrips();
   }, []);
 
@@ -71,6 +70,7 @@ export default function FeaturedTrips() {
             <div
               key={trip.id}
               className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+              onClick={() => push(`/tripDetail/${trip.id}`)}
             >
               <img
                 src={trip.images}
