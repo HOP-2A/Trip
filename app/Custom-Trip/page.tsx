@@ -22,6 +22,7 @@ type CustomTripType = {
   peopleCount: number;
   destination: string;
   title: string;
+  images: string[];
 };
 
 const CustomTrip = () => {
@@ -141,129 +142,112 @@ const CustomTrip = () => {
           />
           <Calendar05 onChange={setDuration} />
 
-          <div className="flex justify-center">
-            <div className="flex items-center w-[600px] py-5 border justify-around">
-              <Input
-                placeholder="Where you wanna go... "
-                name="input"
-                className="w-80"
-                value={inputValue}
-                onChange={(e) => {
-                  handleInput(e);
-                }}
-              />
-              <Calendar05 onChange={setDuration} />
-
-              <Popover>
-                <PopoverTrigger>Open</PopoverTrigger>
-                <PopoverContent>
-                  <div>
-                    Том хүн (12+) нас
-                    <div>
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          setCount(count - 1);
-                        }}
-                      >
-                        -
-                      </Button>
-                      {count}
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          setCount(count + 1);
-                        }}
-                      >
-                        +
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
-                    Хүүхэд (2-11) нас
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setCount2(count2 - 1);
-                      }}
-                    >
-                      -
-                    </Button>
-                    {count2}
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setCount2(count2 + 1);
-                      }}
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <div>
-                    Нярай (0-1) нас
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setCount3(count3 - 1);
-                      }}
-                    >
-                      -
-                    </Button>
-                    {count3}
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setCount3(count3 + 1);
-                      }}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <Button
-                variant="ghost"
-                className="border"
-                onClick={() => {
-                  CustomTripCreate();
-                }}
-              >
-                Create
-              </Button>
-              {/* <BringCustomTrip /> */}
-            </div>
-          </div>
-          <Dialog />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            tanii buteesen aylal:
-            {bringData.map((bring) => {
-              return (
-                <div
-                  key={bring.id}
-                  className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+          <Popover>
+            <PopoverTrigger>open</PopoverTrigger>
+            <PopoverContent>
+              <div>
+                Том хүн (12+) нас
+                <div>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCount(count - 1);
+                    }}
+                  >
+                    -
+                  </Button>
+                  {count}
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCount(count + 1);
+                    }}
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+              <div>
+                Хүүхэд (2-11) нас
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount2(count2 - 1);
+                  }}
                 >
-                  <div>
-                    <div
-                      onClick={() => {
-                        push(`/Custom-Trip/${bring.id}`);
-                      }}
-                      className="p-4 space-y-2"
-                    >
-                      <h3 className="font-semibold text-lg leading-snug">
-                        {bring.title}
-                      </h3>
-                      <div className="text-sm text-gray-600">
-                        {bring.startDate}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {bring.endDate}
-                      </div>
+                  -
+                </Button>
+                {count2}
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount2(count2 + 1);
+                  }}
+                >
+                  +
+                </Button>
+              </div>
+              <div>
+                Нярай (0-1) нас
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount3(count3 - 1);
+                  }}
+                >
+                  -
+                </Button>
+                {count3}
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setCount3(count3 + 1);
+                  }}
+                >
+                  +
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Button
+            onClick={() => {
+              CustomTripCreate();
+            }}
+          >
+            Create
+          </Button>
+        </div>
+        <Dialog />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {bringData.map((bring) => {
+            return (
+              <div
+                key={bring.id}
+                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+              >
+                <img
+                  src={bring.images[0]}
+                  alt={bring.title}
+                  className="w-full h-40 object-cover"
+                />
+                <div>
+                  <div
+                    onClick={() => {
+                      push(`/Custom-Trip/${bring.id}`);
+                    }}
+                    className="p-4 space-y-2"
+                  >
+                    <h3 className="font-semibold text-lg leading-snug">
+                      {bring.title}
+                    </h3>
+                    <div className="text-sm text-gray-600">
+                      {bring.startDate}
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
