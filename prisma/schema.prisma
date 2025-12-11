@@ -83,13 +83,6 @@ model TripDay {
   title       String?
   description String?
 
-<<<<<<< HEAD
   tripPlan   TripPlan? @relation(fields: [tripPlanId], references: [id])
   tripPlanId String?
 }
-=======
-  tripPlan   TripPlan?      @relation(fields: [tripPlanId], references: [id])
-  tripPlanId String?
-}
-
->>>>>>> e0fe0b7 (create hugging face)
