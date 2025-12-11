@@ -26,7 +26,6 @@ model User {
 
 model CustomTrip {
   id          String    @id @default(nanoid())
-  title       String
   destination String
   startDate   DateTime?
   endDate     DateTime?
@@ -55,7 +54,7 @@ model TripMember {
 
 model CustomTripDay {
   id           String  @id @default(nanoid())
-  customTripId String 
+  customTripId String
   dayNumber    Int
   title        String?
   description  String?
