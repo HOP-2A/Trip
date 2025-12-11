@@ -22,8 +22,8 @@ type CustomTripType = {
   endDate: string;
   peopleCount: number;
   destination: string;
-  title: string;
   images: string[];
+  createdById: string;
 };
 
 const CustomTrip = () => {
@@ -36,6 +36,9 @@ const CustomTrip = () => {
   const [prompt, setPrompt] = useState("");
   const [bringData, setBringData] = useState<CustomTripType[]>([]);
   const { push } = useRouter();
+
+  const { user: clerkUser } = useUser();
+  const { user } = useAuth(clerkUser?.id);
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setPrompt(event.target.value);
@@ -85,6 +88,7 @@ const CustomTrip = () => {
         peopleCount: total,
         destination: prompt,
         images: imageUrl,
+        createdById: user,
       }),
     });
     const res = await response.json();
