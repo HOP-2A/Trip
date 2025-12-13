@@ -77,7 +77,11 @@ const CustomTripDay = () => {
   useEffect(() => {
     customTripDayBring();
   }, []);
-
+  console.log(
+    bringData.map((data) => {
+      data.customTrip.images;
+    })
+  );
   return (
     <div>
       <div>

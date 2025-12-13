@@ -2,20 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "../_components/Header";
 import { Calendar05 } from "../_components/Calender";
-import { upload } from "@vercel/blob/client";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Dialog } from "../_components/Dialog";
 import { ChangeEvent, useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { useAuth } from "@/hooks/use-auth";
-import { useUser } from "@clerk/nextjs";
+import { Pop } from "../_components/Popover";
+import { GenerateImage } from "../_components/GenerateImg";
+import { Input } from "@/components/ui/input";
+
 type CustomTripType = {
   id: string;
   startDate: string;
@@ -28,74 +22,39 @@ type CustomTripType = {
 
 const CustomTrip = () => {
   const [duration, setDuration] = useState<DateRange | undefined>();
-  const [count, setCount] = useState<number>(1);
-  const [count2, setCount2] = useState<number>(0);
-  const [count3, setCount3] = useState<number>(0);
-  const [imageUrl, setImageUrl] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [prompt, setPrompt] = useState("");
   const [bringData, setBringData] = useState<CustomTripType[]>([]);
+  const [input, setInput] = useState("");
+  const [totalPerson, setTotalPerson] = useState(0);
+  const [imageUrl, setImageUrl] = useState<string[]>([]);
   const { push } = useRouter();
 
   const { user: clerkUser } = useUser();
-  const { user } = useAuth(clerkUser?.id); // useUser ees avsn clerkUsernii id iig clerkUser ruu hiigd ternes user avjin
-  console.log(user);
-
-  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
-    setPrompt(event.target.value);
-  };
-
-  const total = count + count2 + count3;
-
+  const { user } = useAuth(clerkUser?.id); 
+ 
   const BringCustomTrip = async () => {
-    const response = await fetch("/api/trip/tripPost/customTrip", {
-      method: "GET",
-    });
+    const response = await fetch("/api/trip/tripPost/customTrip");
     const data = await response.json();
     setBringData(data);
   };
-  const generateImage = async () => {
-    if (!prompt.trim()) return;
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/images/generate", {
-        method: "POST",
-        body: JSON.stringify({ prompt }),
-      });
-
-      if (!response.ok) throw new Error("Failed to generate");
-
-      const blob = await response.blob();
-
-      const file = new File([blob], "generated.png", { type: "image/png" });
-
-      const uploaded = await upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/images/upload",
-      });
-      setImageUrl((prev) => [...prev, uploaded.url]);
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-    }
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+    setInput(event.target.value);
   };
+
   const CustomTripCreate = async () => {
-    const response = await fetch("/api/trip/tripPost/customTrip", {
+    await fetch("/api/trip/tripPost/customTrip", {
       method: "POST",
       body: JSON.stringify({
         startDate: duration?.from?.toISOString(),
         endDate: duration?.to?.toISOString(),
-        peopleCount: total,
-        destination: prompt,
+        peopleCount: totalPerson,
+        destination: input,
         images: imageUrl,
         createdById: user?.id,
       }),
     });
-    const res = await response.json();
   };
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     BringCustomTrip();
   }, []);
 
@@ -147,88 +106,20 @@ const CustomTrip = () => {
           төлөвлөж өгье!
         </div>
         <div className="flex justify-evenly">
-          <Input
-            placeholder="Where you wanna go... "
-            name="input"
-            className="w-80"
-            onChange={(e) => {
-              handleInput(e);
-            }}
-            value={prompt}
-            disabled={isLoading}
-          />
+          <GenerateImage imageUrl={imageUrl} setImageUrl={setImageUrl} />
+          <div>
+            <Input
+              placeholder="Your destination... "
+              value={input}
+              onChange={(e) => {
+                handleInput(e);
+              }}
+            />
+          </div>
           <Calendar05 onChange={setDuration} />
-
-          <Popover>
-            <PopoverTrigger>open</PopoverTrigger>
-            <PopoverContent>
-              <div>
-                Том хүн (12+) нас
-                <div>
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setCount(count - 1);
-                    }}
-                  >
-                    -
-                  </Button>
-                  {count}
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setCount(count + 1);
-                    }}
-                  >
-                    +
-                  </Button>
-                </div>
-              </div>
-              <div>
-                Хүүхэд (2-11) нас
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setCount2(count2 - 1);
-                  }}
-                >
-                  -
-                </Button>
-                {count2}
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setCount2(count2 + 1);
-                  }}
-                >
-                  +
-                </Button>
-              </div>
-              <div>
-                Нярай (0-1) нас
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setCount3(count3 - 1);
-                  }}
-                >
-                  -
-                </Button>
-                {count3}
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setCount3(count3 + 1);
-                  }}
-                >
-                  +
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <Pop totalPerson={totalPerson} setTotalPerson={setTotalPerson} />
           <Button
             onClick={() => {
-              generateImage();
               CustomTripCreate();
             }}
           >
