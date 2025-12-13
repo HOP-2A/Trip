@@ -27,13 +27,15 @@ export default function FeaturedTrips() {
       <div className="relative">
         <Header />
         <img
-          src={"/nature.jpg"}
+          src={
+            "nature.jpeg"
+          }
           alt="Nature Photo"
           className="w-full h-[600px] object-cover object-center"
         />
         <div className="flex flex-col gap-10 items-center justify-center absolute inset-0">
           <h1 className="text-white text-5xl font-extrabold text-center px-4">
-            Plan Your Next Adventure
+            Амьдрал бол гайхамшиг
           </h1>
           <div className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold rounded-lg shadow-lg transition-transform">
             <Button
