@@ -38,7 +38,8 @@ const CustomTrip = () => {
   const { push } = useRouter();
 
   const { user: clerkUser } = useUser();
-  const { user } = useAuth(clerkUser?.id);
+  const { user } = useAuth(clerkUser?.id); // useUser ees avsn clerkUsernii id iig clerkUser ruu hiigd ternes user avjin
+  console.log(user);
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setPrompt(event.target.value);
@@ -88,7 +89,7 @@ const CustomTrip = () => {
         peopleCount: total,
         destination: prompt,
         images: imageUrl,
-        createdById: user,
+        createdById: user?.id,
       }),
     });
     const res = await response.json();
