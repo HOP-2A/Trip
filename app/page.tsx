@@ -30,7 +30,7 @@ export default function Home() {
     async function loadTrips() {
       try {
         const res = await fetch("/api/trip/tripGet/allTripsGet");
-        const data = await res.json();
+        const data: Trip[] = await res.json();
         setTrips(data);
 
         const uniqueDestinations = [
