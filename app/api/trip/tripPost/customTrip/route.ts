@@ -3,16 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
-  const { startDate, endDate, peopleCount, destination, images, createdById } = body;
+  const { startDate, endDate, peopleCount, destination, images, createdById } =
+    body;
 
   const dbUser = await prisma.user.findUnique({
     where: { clerkId: createdById.clerkId },
   });
+  
   if (!dbUser) {
     return new Response("user not found", { status: 404 });
   }
 
-  const response = await prisma.customTrip.create({
+  const newTrip = await prisma.customTrip.create({
     data: {
       startDate,
       endDate,
@@ -22,7 +24,7 @@ export const POST = async (req: NextRequest) => {
       createdById: dbUser.id,
     },
   });
-  return NextResponse.json(response);
+  return NextResponse.json(newTrip);
 };
 export const GET = async (req: NextRequest) => {
   const response = await prisma.customTrip.findMany({});

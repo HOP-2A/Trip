@@ -9,6 +9,8 @@ import { DateRange } from "react-day-picker";
 import { Pop } from "../_components/Popover";
 import { GenerateImage } from "../_components/GenerateImg";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
+import { useUser } from "@clerk/nextjs";
 
 type CustomTripType = {
   id: string;
@@ -29,8 +31,8 @@ const CustomTrip = () => {
   const { push } = useRouter();
 
   const { user: clerkUser } = useUser();
-  const { user } = useAuth(clerkUser?.id); 
- 
+  const { user } = useAuth(clerkUser?.id);
+
   const BringCustomTrip = async () => {
     const response = await fetch("/api/trip/tripPost/customTrip");
     const data = await response.json();
@@ -66,8 +68,7 @@ const CustomTrip = () => {
           <img
             src={"airBalloon.jpeg"}
             alt="Nature Photo"
-          className="w-full h-[600px] object-cover object-center"
-            
+            className="w-full h-[600px] object-cover object-center"
           />
           <div className="flex flex-col gap-10 items-center justify-center absolute inset-0">
             <h1 className="text-white text-5xl font-extrabold text-center px-4">
@@ -136,7 +137,6 @@ const CustomTrip = () => {
               >
                 <img
                   src={bring.images[0]}
-                  alt={bring.title}
                   className="w-full h-40 object-cover"
                 />
                 <div>
@@ -146,9 +146,6 @@ const CustomTrip = () => {
                     }}
                     className="p-4 space-y-2"
                   >
-                    <h3 className="font-semibold text-lg leading-snug">
-                      {bring.title}
-                    </h3>
                     <div className="text-sm text-gray-600">
                       {bring.startDate}
                     </div>
