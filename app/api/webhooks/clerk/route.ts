@@ -30,7 +30,6 @@ export async function POST(req: Request) {
 
   const email = user.email_addresses?.[0]?.email_address ?? null;
   const name = user.first_name || "";
-  console.log(user);
 
   if (eventType === "user.created") {
     await prisma.user.create({
