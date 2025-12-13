@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   try {
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
+      "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
       {
         method: "POST",
         headers: {
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
           inputs: prompt,
           parameters: {
             negative_prompt: "blurry, bad quality, distorted",
-            num_inference_steps: 20,
+            num_inference_steps: 5,
             guidance_scale: 7.5,
           },
         }),
