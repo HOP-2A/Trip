@@ -9,6 +9,8 @@ import { DateRange } from "react-day-picker";
 import { Pop } from "../_components/Popover";
 import { GenerateImage } from "../_components/GenerateImg";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
+import { useUser } from "@clerk/nextjs";
 
 type CustomTripType = {
   id: string;
@@ -135,7 +137,6 @@ const CustomTrip = () => {
               >
                 <img
                   src={bring.images[0]}
-                  alt={bring.title}
                   className="w-full h-40 object-cover"
                 />
                 <div>
@@ -145,9 +146,6 @@ const CustomTrip = () => {
                     }}
                     className="p-4 space-y-2"
                   >
-                    <h3 className="font-semibold text-lg leading-snug">
-                      {bring.title}
-                    </h3>
                     <div className="text-sm text-gray-600">
                       {bring.startDate}
                     </div>

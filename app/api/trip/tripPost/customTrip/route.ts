@@ -21,7 +21,6 @@ export const POST = async (req: NextRequest) => {
       destination,
       images,
       createdById: dbUser.id,
-      images,
     },
   });
   return NextResponse.json(newTrip);
