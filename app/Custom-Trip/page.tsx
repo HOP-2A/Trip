@@ -16,8 +16,8 @@ type CustomTripType = {
   endDate: string;
   peopleCount: number;
   destination: string;
-  title: string;
   images: string[];
+  createdById: string;
 };
 
 const CustomTrip = () => {
@@ -28,6 +28,9 @@ const CustomTrip = () => {
   const [imageUrl, setImageUrl] = useState<string[]>([]);
   const { push } = useRouter();
 
+  const { user: clerkUser } = useUser();
+  const { user } = useAuth(clerkUser?.id); 
+ 
   const BringCustomTrip = async () => {
     const response = await fetch("/api/trip/tripPost/customTrip");
     const data = await response.json();
@@ -46,6 +49,7 @@ const CustomTrip = () => {
         peopleCount: totalPerson,
         destination: input,
         images: imageUrl,
+        createdById: user?.id,
       }),
     });
   };
@@ -60,13 +64,14 @@ const CustomTrip = () => {
         <Header />
         <div className="relative">
           <img
-            src={"/custom.jpg"}
+            src={"airBalloon.jpeg"}
             alt="Nature Photo"
-            className="w-full h-150 object-cover object-center"
+          className="w-full h-[600px] object-cover object-center"
+            
           />
           <div className="flex flex-col gap-10 items-center justify-center absolute inset-0">
             <h1 className="text-white text-5xl font-extrabold text-center px-4">
-              Plan Your Next Adventure
+              Шинэ газар, шинэ мэдрэмж
             </h1>
             <div className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold rounded-lg shadow-lg transition-transform">
               <Button
