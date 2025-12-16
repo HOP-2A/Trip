@@ -45,9 +45,6 @@ export default function Home() {
     loadTrips();
   }, []);
 
-  console.log(destinations);
-  console.log(trips);
-
   return (
     <div className="min-h-screen bg-gray-100 relative">
       <div className="relative">

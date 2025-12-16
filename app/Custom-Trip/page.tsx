@@ -31,7 +31,6 @@ const CustomTrip = () => {
   const { push } = useRouter();
 
   const { user: clerkUser } = useUser();
-  const { user } = useAuth(clerkUser?.id);
 
   const BringCustomTrip = async () => {
     const response = await fetch("/api/trip/tripPost/customTrip");
@@ -51,7 +50,7 @@ const CustomTrip = () => {
         peopleCount: totalPerson,
         destination: input,
         images: imageUrl,
-        createdById: user?.id,
+        createdById: clerkUser?.id,
       }),
     });
   };
