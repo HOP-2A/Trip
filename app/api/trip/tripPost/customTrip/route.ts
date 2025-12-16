@@ -7,9 +7,9 @@ export const POST = async (req: NextRequest) => {
     body;
 
   const dbUser = await prisma.user.findUnique({
-    where: { clerkId: createdById.clerkId },
+    where: { clerkId: createdById },
   });
-  
+
   if (!dbUser) {
     return new Response("user not found", { status: 404 });
   }

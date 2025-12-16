@@ -22,8 +22,8 @@ export default function Home() {
   const [duration, setDuration] = useState<DateRange | undefined>();
   const [inputValue, setInputValue] = useState("");
   const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState([]);
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [filteredTrips, setFilteredTrips] = useState<Trip[]>([]);
   const [destinations, setDestinations] = useState<string[]>([]);
 
   useEffect(() => {
@@ -45,8 +45,22 @@ export default function Home() {
     loadTrips();
   }, []);
 
-  console.log(destinations);
-  console.log(trips);
+  const handleSearch = () => {
+    const searchResults = trips.filter((t) => {
+      const matchedDestinations = t.destination
+        .toLowerCase()
+        .includes(inputValue.toLowerCase());
+      let matchesDate = true;
+      if (duration?.from && duration?.to) {
+        const tripStart = new Date(t.startDate);
+        const tripEnd = new Date(t.endDate);
+
+        matchesDate = tripEnd >= duration.from && tripStart <= duration.to;
+      }
+      return matchedDestinations && matchesDate;
+    });
+    setFilteredTrips(searchResults);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 relative">
@@ -90,17 +104,37 @@ export default function Home() {
 
       <div className="flex justify-center">
         <div className="flex items-center w-[600px] py-5 border justify-around">
-          <Input
-            placeholder="Where you wanna go... "
-            name="input"
-            className="w-80"
-            value={inputValue}
-            onClick={() => setIsSearchDropdownOpen(true)}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              setIsSearchDropdownOpen(true);
-            }}
-          />
+          <div>
+            <Input
+              placeholder="Where you wanna go..."
+              className="w-80"
+              value={inputValue}
+              onFocus={() => setIsSearchDropdownOpen(true)}
+              onBlur={() => setIsSearchDropdownOpen(false)}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                setIsSearchDropdownOpen(true);
+              }}
+            />
+            <div>
+              {isSearchDropdownOpen && destinations.length > 0 && (
+                <div className="absolute bg-white shadow rounded w-80 mt-2 max-h-60 overflow-y-auto">
+                  {destinations.map((d) => (
+                    <div
+                      key={d}
+                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                      onMouseDown={() => {
+                        setInputValue(d);
+                        setIsSearchDropdownOpen(false);
+                      }}
+                    >
+                      {d}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
 
           <div>
             {destinations?.map((d, index) => (
@@ -112,7 +146,7 @@ export default function Home() {
 
           <Calendar05 onChange={setDuration} />
 
-          <div>
+          <div onClick={handleSearch} className="cursor-pointer">
             <Search />
           </div>
         </div>
@@ -123,7 +157,10 @@ export default function Home() {
           Featured Trips
         </h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {trips?.slice(0, 4).map((trip) => (
+          {(filteredTrips && filteredTrips.length > 0
+            ? filteredTrips
+            : trips?.slice(0, 4)
+          ).map((trip) => (
             <div
               key={trip.id}
               className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
@@ -133,7 +170,6 @@ export default function Home() {
                 alt={trip.title}
                 className="w-full h-40 object-cover"
               />
-
               <div className="p-4 space-y-2">
                 <h3 className="font-semibold text-lg leading-snug">
                   {trip.title}
