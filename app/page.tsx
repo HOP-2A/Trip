@@ -8,20 +8,35 @@ import { DateRange } from "react-day-picker";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
+type Trip = {
+  id: string;
+  title: string;
+  destination: string;
+  images: string[];
+  startDate: string;
+  endDate: string;
+};
+
 export default function Home() {
   const { push } = useRouter();
   const [duration, setDuration] = useState<DateRange | undefined>();
   const [inputValue, setInputValue] = useState("");
   const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState(null);
-  const [trips, setTrips] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [destinations, setDestinations] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadTrips() {
       try {
-        const res = await fetch("api/trip/tripGet/allTripsGet");
-        const data = await res.json();
+        const res = await fetch("/api/trip/tripGet/allTripsGet");
+        const data: Trip[] = await res.json();
         setTrips(data);
+
+        const uniqueDestinations = [
+          ...new Set(data?.map((trip) => trip.destination)),
+        ];
+        setDestinations(uniqueDestinations);
       } catch (err) {
         console.error("Failed to fetch trips:", err);
       }
@@ -29,12 +44,6 @@ export default function Home() {
 
     loadTrips();
   }, []);
-
-  const searchForTrips = () => {
-    fetch(``);
-  };
-
-  console.log(trips);
 
   return (
     <div className="min-h-screen bg-gray-100 relative">
@@ -90,6 +99,14 @@ export default function Home() {
             }}
           />
 
+          <div>
+            {destinations?.map((d, index) => (
+              <div key={index}>
+                <div>{d}</div>
+              </div>
+            ))}
+          </div>
+
           <Calendar05 onChange={setDuration} />
 
           <div>
@@ -103,13 +120,13 @@ export default function Home() {
           Featured Trips
         </h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {trips.slice(0, 4).map((trip) => (
+          {trips?.slice(0, 4).map((trip) => (
             <div
               key={trip.id}
               className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
             >
               <img
-                src={trip.images}
+                src={trip.images[0]}
                 alt={trip.title}
                 className="w-full h-40 object-cover"
               />
@@ -119,7 +136,6 @@ export default function Home() {
                   {trip.title}
                 </h3>
                 <div className="text-sm text-gray-600">{trip.startDate}</div>
-                <div className="text-sm text-gray-600">{trip.duration}</div>
               </div>
             </div>
           ))}
