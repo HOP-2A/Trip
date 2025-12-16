@@ -28,7 +28,6 @@ type CustomTripDayType = {
 const CustomTripDay = () => {
   const params = useParams();
   const DayId = params.CustomTripDay;
-
   const [bringData, setBringData] = useState<CustomTripDayType[]>([]);
   const [dayNumber, setDayNumber] = useState<number>();
   const [input, setInput] = useState<inpType>({
@@ -58,7 +57,7 @@ const CustomTripDay = () => {
   };
 
   const CustomTripDayCreate = async () => {
-    const response = await fetch(`/api/trip/tripPost/customTripDay/${DayId}`, {
+    await fetch(`/api/trip/tripPost/customTripDay/${DayId}`, {
       method: "POST",
       body: JSON.stringify({
         dayNumber: dayNumber,
@@ -66,7 +65,6 @@ const CustomTripDay = () => {
         description: input.description,
       }),
     });
-    await response.json();
   };
 
   const customTripDayBring = async () => {
