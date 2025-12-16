@@ -52,8 +52,8 @@ const CustomTripDay = () => {
       const end = data.customTrip.endDate;
       const start = data.customTrip.startDate;
       const diffMs = new Date(end).getTime() - new Date(start).getTime();
-      const dayNumber = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      setDayNumber(dayNumber);
+      const dayNum = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      setDayNumber(dayNum);
     });
   };
 
@@ -61,7 +61,7 @@ const CustomTripDay = () => {
     const response = await fetch(`/api/trip/tripPost/customTripDay/${DayId}`, {
       method: "POST",
       body: JSON.stringify({
-        dayNumber,
+        dayNumber: dayNumber,
         title: input.title,
         description: input.description,
       }),
