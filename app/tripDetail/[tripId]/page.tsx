@@ -2,12 +2,13 @@
 import { Clock7, Clock8, MapPinned } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Snowfall from "react-snowfall";
 
 const Page = () => {
   const [trip, setTrip] = useState({});
   const params = useParams();
   const { tripId } = params;
+
+  
 
   useEffect(() => {
     if (!tripId) return;
@@ -24,18 +25,8 @@ const Page = () => {
   console.log(trip);
   return (
     <div>
-      <div className="w-full h-[100vh] relative w-full h-[100vh] bg-black py-10 overflow-hidden ">
-        <Snowfall
-          snowflakeCount={200}
-          color="white"
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 0,
-            pointerEvents: "none",
-          }}
-        />
-         
+      <div className="w-full h-[100vh] relative w-full h-[100vh]  py-10 overflow-hidden ">
+        
         <div className="relative z-10 w-full max-w-[1500px] mx-auto flex flex-col gap-6 px-8 ">
           <div className="relative flex justify-center">
             <div className="w-60 h-[500px] bg-[#c2e4f1] to-transparent rounded-tl-2xl rounded-bl-2xl" />
@@ -70,7 +61,10 @@ const Page = () => {
                 <Clock8 className="h-5 w-5" />
                 <div className="text-gray-900">{trip?.endDate}</div>
               </div>
+
             </div>
+             
+
           </div>
         </div>
       </div>
