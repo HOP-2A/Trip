@@ -5,8 +5,17 @@ import { Header } from "../_components/Header";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
+type Trip = {
+  id: string;
+  title: string;
+  destination: string;
+  images: string[];
+  startDate: string;
+  endDate: string;
+};
+
 export default function FeaturedTrips() {
-  const [trips, setTrips] = useState([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const { push } = useRouter();
 
   useEffect(() => {
@@ -27,9 +36,7 @@ export default function FeaturedTrips() {
       <div className="relative">
         <Header />
         <img
-          src={
-            "nature.jpeg"
-          }
+          src={"nature.jpeg"}
           alt="Nature Photo"
           className="w-full h-[600px] object-cover object-center"
         />
@@ -75,7 +82,7 @@ export default function FeaturedTrips() {
               onClick={() => push(`/tripDetail/${trip.id}`)}
             >
               <img
-                src={trip.images}
+                src={trip.images[0]}
                 alt={trip.title}
                 className="w-full h-40 object-cover"
               />
@@ -85,7 +92,6 @@ export default function FeaturedTrips() {
                   {trip.title}
                 </h3>
                 <div className="text-sm text-gray-600">{trip.startDate}</div>
-                <div className="text-sm text-gray-600">{trip.duration}</div>
               </div>
             </div>
           ))}
