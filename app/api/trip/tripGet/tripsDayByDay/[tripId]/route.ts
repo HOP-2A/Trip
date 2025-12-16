@@ -7,7 +7,7 @@ export const POST = async (
 ) => {
   const { tripId } = await context.params;
   const tripDay = await prisma.tripDay.findMany({
-    where: {
+    where: {             
       tripPlanId: tripId,
     },
   });
