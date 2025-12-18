@@ -71,7 +71,7 @@ const CustomTripDay = () => {
     await fetch(`/api/trip/tripPost/customTripDay/${DayId}`, {
       method: "POST",
       body: JSON.stringify({
-        dayNumber,
+        dayNumber: dayNumber,
         title: input.title,
         description: input.description,
       }),
