@@ -136,6 +136,14 @@ export default function Home() {
             </div>
           </div>
 
+          <div>
+            {destinations?.map((d, index) => (
+              <div key={index}>
+                <div>{d}</div>
+              </div>
+            ))}
+          </div>
+
           <Calendar05 onChange={setDuration} />
 
           <div onClick={handleSearch} className="cursor-pointer">
