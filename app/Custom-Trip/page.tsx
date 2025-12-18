@@ -9,7 +9,6 @@ import { DateRange } from "react-day-picker";
 import { Pop } from "../_components/Popover";
 import { GenerateImage } from "../_components/GenerateImg";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/use-auth";
 import { useUser } from "@clerk/nextjs";
 
 type CustomTripType = {
