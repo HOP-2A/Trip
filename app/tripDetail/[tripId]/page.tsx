@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Pop } from "@/app/_components/Popover";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
-
 type Trip = {
   id: string;
   title: string;
@@ -36,6 +35,7 @@ const formatDate = (iso: string) => {
   const year = d.getFullYear();
   return `${month}.${day}.${year}`;
 };
+console.log(formatDate);
 
 const BannerSkeleton = () => (
   <div className="h-[400px] w-full bg-gray-200 rounded-3xl animate-pulse" />
@@ -217,7 +217,12 @@ const Page = () => {
           ) : (
             <>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
+                <h3 className="text-2xl font-bold mb-4 text-gray-500">
+                  Захиалгын мэдээлэл
+                </h3>
+                <hr></hr>
+                <Calendar/>
+                <div>{}</div>
                 <div className="space-y-6">
                   <div className="flex justify-between items-center pb-4 border-b border-gray-50">
                     <div className="flex items-center gap-3">
