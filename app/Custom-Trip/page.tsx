@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Header } from "../_components/Header";
 import { Calendar05 } from "../_components/Calender";
 import { useRouter } from "next/navigation";
-import { Dialog } from "../_components/Dialog";
+import { DialogDemo } from "../_components/Dialog";
 import { ChangeEvent, useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Pop } from "../_components/Popover";
@@ -127,7 +127,7 @@ const CustomTrip = () => {
             Create
           </Button>
         </div>
-        <Dialog />
+        <DialogDemo />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {bringData.map((bring) => {
             return (

@@ -1,37 +1,34 @@
+import { Button } from "@/components/ui/button";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-export const Dialog = () => {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+export function DialogDemo() {
   return (
-    <div>
-      <div>
-        <AlertDialog>
-          <AlertDialogTrigger>Хэрхэн аялал бүтээх вэ?</AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Хэрхэн аялал бүтээх вэ?</AlertDialogTitle>
-              <AlertDialogDescription>
-                <div> 1. Аялах хот болон хугацаагаа сонгох </div>
-                <div>2. Хамт аялахаар төлөвлөж буй хүмүүсийн тоог оруулах</div>
-                3. Нэмэлтээр та ямар төрлийн бүтээгдэхүүн үйлчилгээг тухайн
-                төлөвлөгөөнд багтаах хүсэлтэй байгааг оруулах 1 хүний зардал
-                Авах бүтээгдэхүүн үйлчилгээ (Нислэг, буудал, хийх зүйлс ...)
-                Нэмэлтээр таны аялалд багтах шаардлагатай зүйлс
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogAction>Continue</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-    </div>
+    <Dialog>
+      <form>
+        <DialogTrigger asChild>
+          <Button variant="outline"> Хэрхэн аялал бүтээх вэ?</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle> Хэрхэн аялал бүтээх вэ?</DialogTitle>
+            <DialogDescription>
+              <div> 1. Аялах хот болон хугацаагаа сонгох </div>
+              <div>2. Хамт аялахаар төлөвлөж буй хүмүүсийн тоог оруулах</div>
+              3. Нэмэлтээр та ямар төрлийн бүтээгдэхүүн үйлчилгээг тухайн
+              төлөвлөгөөнд багтаах хүсэлтэй байгааг оруулах 1 хүний зардал Авах
+              бүтээгдэхүүн үйлчилгээ (Нислэг, буудал, хийх зүйлс ...) Нэмэлтээр
+              таны аялалд багтах шаардлагатай зүйлс
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </form>
+    </Dialog>
   );
-};
+}
