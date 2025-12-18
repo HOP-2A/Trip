@@ -4,9 +4,9 @@ import { Header } from "./_components/Header";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Calendar05 } from "./_components/Calender";
-import { DateRange } from "react-day-picker";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
 type Trip = {
   id: string;
@@ -63,9 +63,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 relative">
+    <div className="min-h-screen">
       <div className="relative">
-        <div className="right-0 absolute py-5 px-30">
+        <div className="absolute top-0 w-full">
           <Header />
         </div>
 
@@ -134,14 +134,6 @@ export default function Home() {
                 </div>
               )}
             </div>
-          </div>
-
-          <div>
-            {destinations?.map((d, index) => (
-              <div key={index}>
-                <div>{d}</div>
-              </div>
-            ))}
           </div>
 
           <Calendar05 onChange={setDuration} />
