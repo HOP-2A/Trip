@@ -30,6 +30,7 @@ const CustomTripDay = () => {
   const DayId = params.CustomTripDay;
   const [bringData, setBringData] = useState<customTripType[]>([]);
   const [dayNumber, setDayNumber] = useState<number>();
+  const [season, setSeason] = useState("");
   const [input, setInput] = useState<inpType>({
     title: "",
     description: "",
@@ -48,10 +49,15 @@ const CustomTripDay = () => {
 
   const getSeason = (date: Date) => {
     const month = date.getMonth() + 1;
-    if (month >= 3 && month <= 5) return "spring";
-    if (month >= 6 && month <= 8) return "summer";
-    if (month >= 9 && month <= 11) return "autumn";
-    return "winter";
+    if (month >= 3 && month <= 5) {
+      setSeason("spring");
+    } else if (month >= 6 && month <= 8) {
+      setSeason("summer");
+    } else if (month >= 9 && month <= 11) {
+      setSeason("autumn");
+    } else {
+      setSeason("winter");
+    }
   };
 
   const days = () => {
@@ -96,10 +102,7 @@ const CustomTripDay = () => {
           {bringData.map((data, index) => {
             return (
               <div key={index}>
-                <img
-                  className="object-contain w-full rounded-lg   bg-lightbeige lg:h-[33rem]"
-                  src={data.images[0]}
-                />
+                <img className="h-[400px] w-[600px]" src={data.images[0]} />
                 <div className="text-3xl">{data.destination.toUpperCase()}</div>
                 <div>Аялах хүний тоо {data.peopleCount}</div>
                 <div>
@@ -111,6 +114,7 @@ const CustomTripDay = () => {
                     Харуулах
                   </Button>
                   Аялах өдрийн тоо {dayNumber}
+                  Аялах улирал {season}
                 </div>
               </div>
             );
