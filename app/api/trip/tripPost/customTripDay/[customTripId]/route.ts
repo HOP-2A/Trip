@@ -25,11 +25,8 @@ export const GET = async (
 ) => {
   const { customTripId } = await context.params;
 
-  const response = await prisma.customTripDay.findMany({
-    where: { customTripId },
-    include: {
-      customTrip: true,
-    },
+  const response = await prisma.customTrip.findMany({
+    where: { id: customTripId },
   });
 
   return NextResponse.json(response);
