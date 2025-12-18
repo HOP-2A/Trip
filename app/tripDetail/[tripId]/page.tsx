@@ -221,7 +221,7 @@ const Page = () => {
                   Захиалгын мэдээлэл
                 </h3>
                 <hr></hr>
-                <Calendar/>
+                <Calendar />
                 <div>{}</div>
                 <div className="space-y-6">
                   <div className="flex justify-between items-center pb-4 border-b border-gray-50">
