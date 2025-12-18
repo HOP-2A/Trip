@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
-
 type Trip = {
   id: string;
   title: string;
@@ -45,6 +44,7 @@ const formatDate = (iso: string) => {
   const year = d.getFullYear();
   return `${month}.${day}.${year}`;
 };
+console.log(formatDate);
 
 const BannerSkeleton = () => (
   <div className="h-[400px] w-full bg-gray-200 rounded-3xl animate-pulse" />

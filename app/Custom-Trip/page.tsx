@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Header } from "../_components/Header";
 import { Calendar05 } from "../_components/Calender";
 import { useRouter } from "next/navigation";
-import { DialogDemo } from "../_components/Dialog";
+import { Dialoga } from "../_components/Dialog";
 import { ChangeEvent, useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Pop } from "../_components/Popover";
@@ -31,6 +32,7 @@ const CustomTrip = () => {
   const { push } = useRouter();
 
   const { user: clerkUser } = useUser();
+  const { user } = useAuth(clerkUser?.id);
 
   const BringCustomTrip = async () => {
     const response = await fetch("/api/trip/tripPost/customTrip");
@@ -59,7 +61,7 @@ const CustomTrip = () => {
         peopleCount: totalPerson,
         destination: input,
         images: imageUrl,
-        createdById: clerkUser?.id,
+        createdById: user?.id,
       }),
     });
     await BringCustomTrip();
@@ -105,15 +107,15 @@ const CustomTrip = () => {
             </div>
           </div>
         </div>
-        <div>
-          Бид төлөвлөе, та аял — таны мөрөөдлийн аяллыг бид үнэ төлбөргүй
+        <div className="text-center text-2xl font-semibold text-gray-800">
+          Бид төлөвлөе, та аялал — таны мөрөөдлийн аяллыг бид үнэ төлбөргүй
           төлөвлөж өгье!
         </div>
-        <div className="flex justify-evenly">
+        <div className="flex justify-evenly gap-2 pl-2">
           <GenerateImage imageUrl={imageUrl} setImageUrl={setImageUrl} />
           <div>
             <Input
-              placeholder="Your destination... "
+              placeholder="Your destination..."
               value={input}
               onChange={(e) => {
                 handleInput(e);
