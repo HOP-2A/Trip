@@ -61,7 +61,9 @@ const CustomTrip = () => {
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
-        <Header />
+        <div className="right-0 absolute py-5 px-30">
+          <Header />
+        </div>
         <div className="relative">
           <img
             src={"airBalloon.jpeg"}

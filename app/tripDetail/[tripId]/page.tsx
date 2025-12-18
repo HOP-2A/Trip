@@ -2,10 +2,25 @@
 import { Clock7, Clock8, MapPinned } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Snowfall from "react-snowfall";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+type Trip = {
+  id: string;
+  title: string;
+  destination: string;
+  images: string[];
+  startDate: string;
+  endDate: string;
+};
 
 const Page = () => {
-  const [trip, setTrip] = useState({});
+  const [trip, setTrip] = useState<Trip[]>([]);
+  const [tripsDayByDay, setTripsDayByDay] = useState([]);
   const params = useParams();
   const { tripId } = params;
 
@@ -19,23 +34,23 @@ const Page = () => {
         setTrip(res);
       }
     }
+
+    async function getTripsDayByDay() {
+      const response = await fetch(`/api/tripsDayByDay/${tripId}`);
+      if (response.ok) {
+        const res = await response.json();
+        setTripsDayByDay(res);
+      }
+    }
     getTrips();
+    getTripsDayByDay();
   }, [tripId]);
+
   console.log(trip);
+  console.log(tripsDayByDay);
   return (
     <div>
-      <div className="w-full h-[100vh] relative w-full h-[100vh] bg-black py-10 overflow-hidden ">
-        <Snowfall
-          snowflakeCount={200}
-          color="white"
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 0,
-            pointerEvents: "none",
-          }}
-        />
-         
+      <div className="w-full h-[100vh] relative w-full h-[100vh]  py-10 overflow-hidden ">
         <div className="relative z-10 w-full max-w-[1500px] mx-auto flex flex-col gap-6 px-8 ">
           <div className="relative flex justify-center">
             <div className="w-60 h-[500px] bg-[#c2e4f1] to-transparent rounded-tl-2xl rounded-bl-2xl" />
@@ -45,7 +60,6 @@ const Page = () => {
               src={trip.images}
               alt=""
             />
-            
 
             <div className="w-60 h-[500px] bg-[#c24c3a] to-transparent rounded-br-2xl rounded-tr-2xl" />
           </div>
@@ -70,6 +84,19 @@ const Page = () => {
                 <Clock8 className="h-5 w-5" />
                 <div className="text-gray-900">{trip?.endDate}</div>
               </div>
+            </div>
+
+            <div className="max-w-2xl mx-auto border rounded-lg divide-y">
+              {tripsDayByDay.map((trip, index) => (
+                <div key={index}>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value={trip.id}>
+                      <AccordionTrigger>{trip?.title}</AccordionTrigger>
+                      <AccordionContent>{trip?.description}</AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              ))}
             </div>
           </div>
         </div>
