@@ -136,38 +136,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div>
-            <Input
-              placeholder="Where you wanna go..."
-              className="w-80"
-              value={inputValue}
-              onFocus={() => setIsSearchDropdownOpen(true)}
-              onBlur={() => setIsSearchDropdownOpen(false)}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                setIsSearchDropdownOpen(true);
-              }}
-            />
-            <div>
-              {isSearchDropdownOpen && destinations.length > 0 && (
-                <div className="absolute bg-white shadow rounded w-80 mt-2 max-h-60 overflow-y-auto">
-                  {destinations.map((d) => (
-                    <div
-                      key={d}
-                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                      onMouseDown={() => {
-                        setInputValue(d);
-                        setIsSearchDropdownOpen(false);
-                      }}
-                    >
-                      {d}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
           <Calendar05 onChange={setDuration} />
 
           <div onClick={handleSearch} className="cursor-pointer">
