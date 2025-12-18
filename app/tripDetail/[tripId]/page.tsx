@@ -13,8 +13,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
+<<<<<<< HEAD
 import { Input } from "@/components/ui/input";
 
+=======
+>>>>>>> e0f4f71 (UI)
 type Trip = {
   id: string;
   title: string;
@@ -47,6 +50,7 @@ const formatDate = (iso: string) => {
   const year = d.getFullYear();
   return `${month}.${day}.${year}`;
 };
+console.log(formatDate);
 
 const BannerSkeleton = () => (
   <div className="h-[400px] w-full bg-gray-200 rounded-3xl animate-pulse" />
@@ -263,6 +267,23 @@ const Page = () => {
             </>
           ) : (
             <>
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-2xl font-bold mb-4 text-gray-500">
+                  Захиалгын мэдээлэл
+                </h3>
+                <hr></hr>
+                <Calendar/>
+                <div>{}</div>
+                <div className="space-y-6">
+                  <Button
+                    className="w-full py-4 bg-[#2e5d4d] text-white rounded-2xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
+                    onClick={joinTrip}
+                  >
+                    Захиалах
+                  </Button>
+                </div>
+              </div>
+
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
                 {tripMembers.length > 0 && (
