@@ -61,7 +61,7 @@ const CustomTrip = () => {
   return (
     <div>
       <div className="min-h-screen bg-gray-100 relative">
-        <div className="right-0 absolute py-5 px-30">
+        <div className="absolute top-0 w-full">
           <Header />
         </div>
         <div className="relative">

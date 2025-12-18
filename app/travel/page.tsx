@@ -32,12 +32,12 @@ export default function FeaturedTrips() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 relative">
+    <div className="min-h-screen relative">
       <div className="relative">
-        <div className="right-0 absolute py-5 px-30">
+        <div className="absolute top-0 w-full">
           <Header />
         </div>
-        
+
         <img
           src={"nature.jpeg"}
           alt="Nature Photo"
