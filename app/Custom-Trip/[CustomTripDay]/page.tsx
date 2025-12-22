@@ -1,5 +1,4 @@
 "use client";
-import { ExampleCombobox } from "@/app/_components/Combobox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useParams } from "next/navigation";
@@ -10,12 +9,6 @@ type inpType = {
   description: string;
 };
 
-type CustomTripDayType = {
-  dayNumber: number;
-  title: string;
-  description: string;
-  customTripId: string;
-};
 type customTripType = {
   destination: string;
   endDate: string;
@@ -24,10 +17,21 @@ type customTripType = {
   images: string[];
   peopleCount: number;
   title: string;
+  createdById: string;
+  days: [
+    {
+      dayNumber: number;
+      title: string;
+      description: string;
+      customTripId: string;
+    }
+  ];
 };
+
 const CustomTripDay = () => {
   const params = useParams();
   const DayId = params.CustomTripDay;
+  const [day, setDay] = useState([]);
   const [bringData, setBringData] = useState<customTripType[]>([]);
   const [dayNumber, setDayNumber] = useState<number>();
   const [season, setSeason] = useState("");
@@ -92,6 +96,7 @@ const CustomTripDay = () => {
 
   useEffect(() => {
     customTripDayBring();
+    days();
   }, []);
 
   return (
@@ -106,13 +111,6 @@ const CustomTripDay = () => {
                 <div className="text-3xl">{data.destination.toUpperCase()}</div>
                 <div>Аялах хүний тоо {data.peopleCount}</div>
                 <div>
-                  <Button
-                    onClick={() => {
-                      days();
-                    }}
-                  >
-                    Харуулах
-                  </Button>
                   Аялах өдрийн тоо {dayNumber}
                   Аялах улирал {season}
                 </div>
@@ -120,9 +118,11 @@ const CustomTripDay = () => {
             );
           })}
         </div>
-        <div>
-          <div>
+
+        <div className="flex">
+          <div className="flex">
             <Input
+              className="w-[100px]"
               name="title"
               value={input.title}
               placeholder="ner..."
@@ -131,6 +131,7 @@ const CustomTripDay = () => {
               }}
             />
             <Input
+              className="w-[100px]"
               name="description"
               value={input.description}
               placeholder="ner..."
@@ -140,21 +141,12 @@ const CustomTripDay = () => {
             />
           </div>
           <div>
-            <ExampleCombobox />
-          </div>
-          <div>
             <select>
               <option defaultValue="owner">Owner</option>
               <option>Зочин аялагч</option>
             </select>
           </div>
-          <Button
-            onClick={() => {
-              CustomTripDayCreate();
-            }}
-          >
-            create
-          </Button>
+          <Button onClick={CustomTripDayCreate}>create</Button>
         </div>
       </div>
     </div>
