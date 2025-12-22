@@ -11,10 +11,10 @@ export const Footer = () => {
             <div className="text-sm text-white">
               Багийн гишүүд:
               <div className="mt-5">
-                <p>- Энхсайхан</p>
-                <p>- Болорсайхан</p>
                 <p>- Болорнаран</p>
                 <p>- Төрбат</p>
+                <p>- Болорсайхан</p>
+                <p>- Энхсайхан</p>
               </div>
             </div>
           </div>

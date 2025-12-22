@@ -109,7 +109,7 @@ const Page = () => {
   }, [tripId]);
 
   return (
-    <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900">
+    <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
       <div className="mb-8">
         {isLoading || !trip ? (
           <BannerSkeleton />
@@ -195,7 +195,7 @@ const Page = () => {
                   </div>
                 </div>
 
-                <Button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-[0.98]">
+                <Button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 cursor-pointer">
                   Захиалах
                 </Button>
               </div>

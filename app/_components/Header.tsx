@@ -3,20 +3,29 @@
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const { push } = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
+    const isTripDetailPage = pathname.startsWith("/tripDetail/");
+
+    if (isTripDetailPage) {
+      setScrolled(true);
+      return;
+    }
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 200);
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [pathname]);
 
   return (
     <header
