@@ -1,5 +1,6 @@
 "use client";
-import { Clock7, Clock8, MapPinned } from "lucide-react";
+
+import { Calendar, Users, MapPin, Info, Plus, Minus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -8,6 +9,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Pop } from "@/app/_components/Popover";
 
 type Trip = {
   id: string;
@@ -18,90 +21,190 @@ type Trip = {
   endDate: string;
 };
 
+type TripDay = {
+  id: string;
+  title: string;
+  description: string;
+};
+
+const formatDate = (iso: string) => {
+  const d = new Date(iso);
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${month}.${day}.${year}`;
+};
+
+const BannerSkeleton = () => (
+  <div className="h-[400px] w-full bg-gray-200 rounded-3xl animate-pulse" />
+);
+
+const TitleSkeleton = () => (
+  <div className="space-y-4 animate-pulse">
+    <div className="h-10 w-3/4 bg-gray-200 rounded-lg" />
+    <div className="flex gap-4">
+      <div className="h-6 w-32 bg-gray-200 rounded-md" />
+      <div className="h-6 w-32 bg-gray-200 rounded-md" />
+    </div>
+  </div>
+);
+
+const AccordionSkeleton = () => (
+  <div className="space-y-3 animate-pulse">
+    {[1, 2, 3, 4].map((i) => (
+      <div key={i} className="h-16 bg-gray-100 rounded-xl w-full" />
+    ))}
+  </div>
+);
+
+const BookingCardSkeleton = () => (
+  <div className="border border-gray-100 rounded-3xl p-6 space-y-6 animate-pulse">
+    <div className="h-6 w-1/2 bg-gray-200 rounded" />
+    <div className="space-y-3">
+      <div className="h-20 bg-gray-100 rounded-xl" />
+      <div className="h-20 bg-gray-100 rounded-xl" />
+    </div>
+    <div className="h-12 bg-gray-200 rounded-xl w-full" />
+  </div>
+);
+
 const Page = () => {
-  const [trip, setTrip] = useState<Trip[]>([]);
-  const [tripsDayByDay, setTripsDayByDay] = useState([]);
+  const [trip, setTrip] = useState<Trip | null>(null);
+  const [tripsDayByDay, setTripsDayByDay] = useState<TripDay[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [totalPerson, setTotalPerson] = useState(0);
+
   const params = useParams();
   const { tripId } = params;
 
   useEffect(() => {
     if (!tripId) return;
 
-    async function getTrips() {
-      const response = await fetch(`/api/getTripDetail/${tripId}`);
-      if (response.ok) {
-        const res = await response.json();
-        setTrip(res);
+    async function loadData() {
+      setIsLoading(true);
+      try {
+        const tripRes = await fetch(
+          `/api/trip/tripGet/getTripDetail/${tripId}`
+        );
+        if (tripRes.ok) {
+          const tripData: Trip = await tripRes.json();
+          setTrip(tripData);
+        }
+
+        const daysRes = await fetch(
+          `/api/trip/tripGet/tripsDayByDay/${tripId}`
+        );
+        if (daysRes.ok) {
+          const daysData: TripDay[] = await daysRes.json();
+          setTripsDayByDay(daysData);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     }
 
-    async function getTripsDayByDay() {
-      const response = await fetch(`/api/tripsDayByDay/${tripId}`);
-      if (response.ok) {
-        const res = await response.json();
-        setTripsDayByDay(res);
-      }
-    }
-    getTrips();
-    getTripsDayByDay();
+    loadData();
   }, [tripId]);
 
-  console.log(trip);
-  console.log(tripsDayByDay);
   return (
-    <div>
-      <div className="w-full h-[100vh] relative w-full h-[100vh]  py-10 overflow-hidden ">
-        <div className="relative z-10 w-full max-w-[1500px] mx-auto flex flex-col gap-6 px-8 ">
-          <div className="relative flex justify-center">
-            <div className="w-60 h-[500px] bg-[#c2e4f1] to-transparent rounded-tl-2xl rounded-bl-2xl" />
-
+    <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900">
+      <div className="mb-8">
+        {isLoading || !trip ? (
+          <BannerSkeleton />
+        ) : (
+          <div className="relative h-[400px] w-full overflow-hidden rounded-3xl shadow-lg">
             <img
-              className="w-[1400px] h-[500px] object-cover shadow-[0_8px_25px_rgba(0,0,0,0.25)]"
-              src={trip.images}
-              alt=""
+              src={trip.images[0]}
+              alt="Trip banner"
+              className="w-full h-full object-cover"
             />
-
-            <div className="w-60 h-[500px] bg-[#c24c3a] to-transparent rounded-br-2xl rounded-tr-2xl" />
           </div>
+        )}
+      </div>
 
-          <div className="bg-[#fbfbfb] py-4 px-4  rounded-xl shadow-sm w-[700] h-[200px] space-y-2">
-            <div className="flex">
-              <div className="flex gap-4 items-center text-4xl font-extrabold tracking-tight text-[#203250] ">
-                <MapPinned />
-                <span className="leading-none">{trip?.destination}</span>
-                <div>-</div>
-                <div>{trip?.title}</div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-8">
+          {isLoading || !trip ? (
+            <TitleSkeleton />
+          ) : (
+            <div className="space-y-4">
+              <div className="flex flex-col flex-wrap gap-6 py-4 border-y border-gray-100 text-black font-medium">
+                <h1 className="text-4xl font-black uppercase tracking-tight leading-tight">
+                  {trip.destination} ~ {trip.title}
+                </h1>
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Calendar className="w-5 h-5 text-blue-500" />
+                  <span>{formatDate(trip.startDate)}</span>
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="flex gap-3">
-              <div className="flex gap-2">
-                <Clock7 className="h-5 w-5" />
-                <div className="text-gray-900">{trip?.startDate}</div>
-              </div>
+          <div className="mt-10">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              <Info className="w-6 h-6 text-blue-600" /> Аяллын хөтөлбөр
+            </h2>
 
-              <div className="flex gap-2">
-                <Clock8 className="h-5 w-5" />
-                <div className="text-gray-900">{trip?.endDate}</div>
-              </div>
-            </div>
-
-            <div className="max-w-2xl mx-auto border rounded-lg divide-y">
-              {tripsDayByDay.map((trip, index) => (
-                <div key={index}>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value={trip.id}>
-                      <AccordionTrigger>{trip?.title}</AccordionTrigger>
-                      <AccordionContent>{trip?.description}</AccordionContent>
+            {isLoading ? (
+              <AccordionSkeleton />
+            ) : (
+              <div className="space-y-4">
+                {tripsDayByDay.map((day, index) => (
+                  <Accordion
+                    key={day.id}
+                    type="single"
+                    collapsible
+                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <AccordionItem value={day.id} className="border-none">
+                      <AccordionTrigger className="px-5 py-4 hover:no-underline font-bold text-lg">
+                        <div className="flex items-center gap-3">
+                          <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-sm">
+                            Өдөр {index + 1}
+                          </span>
+                          <span>{day.title}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-5 pb-5 text-gray-600 text-base leading-relaxed border-t border-gray-50 pt-4">
+                        {day.description}
+                      </AccordionContent>
                     </AccordionItem>
                   </Accordion>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
+        </div>
+
+        <div className="lg:col-span-4">
+          {isLoading ? (
+            <BookingCardSkeleton />
+          ) : (
+            <div className="sticky top-6 border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+              <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
+
+              <div className="space-y-6">
+                <div className="flex justify-between items-center pb-4 border-b border-gray-50">
+                  <div className="flex items-center gap-3">
+                    <Pop
+                      totalPerson={totalPerson}
+                      setTotalPerson={setTotalPerson}
+                    />
+                  </div>
+                </div>
+
+                <Button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-[0.98]">
+                  Захиалах
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
 export default Page;
