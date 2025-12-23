@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Pop } from "@/app/_components/Popover";
+import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
 
 type Trip = {
   id: string;
@@ -71,11 +73,25 @@ const BookingCardSkeleton = () => (
 const Page = () => {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [tripsDayByDay, setTripsDayByDay] = useState<TripDay[]>([]);
+  const [tripMembers, setTripMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
 
   const params = useParams();
   const { tripId } = params;
+
+  const { user: clerkId } = useUser();
+  const { user } = useAuth(clerkId?.id);
+
+  const joinTrip = async () => {
+    await fetch("/api/trip/tripPlanMember", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: user?.id,
+        tripPlanId: trip?.id,
+      }),
+    });
+  };
 
   useEffect(() => {
     if (!tripId) return;
@@ -97,6 +113,12 @@ const Page = () => {
         if (daysRes.ok) {
           const daysData: TripDay[] = await daysRes.json();
           setTripsDayByDay(daysData);
+        }
+
+        const bringTripMembers = await fetch("/api/trip/tripPlanMember");
+        if (bringTripMembers.ok) {
+          const tripMemberData = await bringTripMembers.json();
+          setTripMembers(tripMemberData);
         }
       } catch (err) {
         console.error(err);
@@ -194,13 +216,27 @@ const Page = () => {
                     />
                   </div>
                 </div>
-
-                <Button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 cursor-pointer">
+                <Button
+                  className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
+                  onClick={joinTrip}
+                >
                   Захиалах
                 </Button>
               </div>
             </div>
           )}
+          <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+            <h3 className="text-xl font-bold mb-6">New Box Title</h3>
+            <div className="space-y-4">
+              <div>
+                {tripMembers.map((tM, index) => (
+                  <div key={index}>
+                    <div>{tM.userId}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
