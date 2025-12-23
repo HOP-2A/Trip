@@ -29,6 +29,13 @@ type TripDay = {
   description: string;
 };
 
+type TripMember = {
+  id: string;
+  userId: string;
+  tripPlanId: string;
+  role: string;
+};
+
 const formatDate = (iso: string) => {
   const d = new Date(iso);
   const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -73,7 +80,7 @@ const BookingCardSkeleton = () => (
 const Page = () => {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [tripsDayByDay, setTripsDayByDay] = useState<TripDay[]>([]);
-  const [tripMembers, setTripMembers] = useState([]);
+  const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
 
@@ -83,14 +90,32 @@ const Page = () => {
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
+  const hasJoined = tripMembers.some(
+    (member: TripMember) => member.userId === user?.id
+  );
+
   const joinTrip = async () => {
-    await fetch("/api/trip/tripPlanMember", {
-      method: "POST",
-      body: JSON.stringify({
-        userId: user?.id,
-        tripPlanId: trip?.id,
-      }),
-    });
+    if (!trip || !user) return;
+
+    if (hasJoined) {
+      await fetch(`/api/trip/tripPlanMember/${trip.id}`, {
+        method: "DELETE",
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      setTripMembers((prev) => prev.filter((m) => m.userId !== user?.id));
+    } else {
+      const res = await fetch(`/api/trip/tripPlanMember/${trip.id}`, {
+        method: "POST",
+        body: JSON.stringify({
+          userId: user.id,
+          tripPlanId: trip.id,
+        }),
+      });
+
+      const newMember = await res.json();
+      setTripMembers((prev) => [...prev, newMember]);
+    }
   };
 
   useEffect(() => {
@@ -238,11 +263,13 @@ const Page = () => {
 
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
-                <div className="space-y-4">
-                  {tripMembers.map((tM, index) => (
-                    <div key={index}>~ {tM.user.name}</div>
-                  ))}
-                </div>
+                {tripMembers.length > 0 && (
+                  <div className="space-y-4">
+                    {tripMembers.map((tM, index) =>
+                      tM.user ? <div key={index}>~ {tM.user.name}</div> : null
+                    )}
+                  </div>
+                )}
               </div>
             </>
           )}
