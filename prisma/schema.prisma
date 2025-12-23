@@ -15,10 +15,10 @@ datasource db {
 }
 
 model User {
-  id      String  @id @default(nanoid())
+  id      String @id @default(nanoid())
   name    String
   email   String @unique
-  clerkId String  @unique
+  clerkId String @unique
 
   customTrips       CustomTrip[]     @relation("CustomTripCreator")
   joinedTrips       TripPlanMember[]
