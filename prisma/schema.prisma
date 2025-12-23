@@ -31,6 +31,7 @@ model CustomTrip {
   endDate     DateTime?
   peopleCount Int?
   images      String[]
+  duration    Int?
 
   createdById String?
   createdBy   User?    @relation(fields: [createdById], references: [id])

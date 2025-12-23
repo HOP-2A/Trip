@@ -8,7 +8,12 @@ type inpType = {
   title: string;
   description: string;
 };
-
+type days = {
+  dayNumber: number;
+  title: string;
+  description: string;
+  customTripId: string;
+};
 type customTripType = {
   destination: string;
   endDate: string;
@@ -18,23 +23,17 @@ type customTripType = {
   peopleCount: number;
   title: string;
   createdById: string;
-  days: [
-    {
-      dayNumber: number;
-      title: string;
-      description: string;
-      customTripId: string;
-    }
-  ];
+  days: days[];
 };
 
 const CustomTripDay = () => {
   const params = useParams();
   const DayId = params.CustomTripDay;
-  const [day, setDay] = useState([]);
+  const [day, setDay] = useState<days[]>([]);
   const [bringData, setBringData] = useState<customTripType[]>([]);
-  const [dayNumber, setDayNumber] = useState<number>();
+  const [dayNumber, setDayNumber] = useState<number[]>([]);
   const [season, setSeason] = useState("");
+  const [loading, setLoading] = useState(false);
   const [input, setInput] = useState<inpType>({
     title: "",
     description: "",
@@ -64,24 +63,20 @@ const CustomTripDay = () => {
     }
   };
 
-  const days = () => {
-    bringData.map((data) => {
-      const end = data.endDate;
-      const start = data.startDate;
-      const diffMs = new Date(end).getTime() - new Date(start).getTime();
-      const dayNum = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      setDayNumber(dayNum);
-
-      getSeason(new Date(start));
-      getSeason(new Date(end));
-    });
-  };
-
   const CustomTripDayCreate = async () => {
+    const data = bringData[0];
+    const dayNumber = Math.floor(
+      (new Date(data.endDate).getTime() - new Date(data.startDate).getTime()) /
+        (1000 * 60 * 60 * 24)
+    );
+
+    getSeason(new Date(data.startDate));
+    getSeason(new Date(data.endDate));
+
     await fetch(`/api/trip/tripPost/customTripDay/${DayId}`, {
       method: "POST",
       body: JSON.stringify({
-        dayNumber: dayNumber,
+        dayNumber,
         title: input.title,
         description: input.description,
       }),
@@ -89,16 +84,27 @@ const CustomTripDay = () => {
   };
 
   const customTripDayBring = async () => {
+    setLoading(true);
     const response = await fetch(`/api/trip/tripPost/customTripDay/${DayId}`);
     const res = await response.json();
+    const daysss = res.map((data: customTripType) => data.days).flat();
+    setDay(daysss);
     setBringData(res);
+    setLoading(false);
+    console.log(daysss, "aerg");
+    console.log(day, "aesrfg");
   };
 
   useEffect(() => {
     customTripDayBring();
-    days();
   }, []);
 
+  if (loading) {
+    return <div>loading</div>;
+  }
+  const days = Array.from({ length: day[0]?.dayNumber }, (_, i) => i + 1);
+  console.log(days);
+  console.log(bringData, "drf");
   return (
     <div>
       <div>
@@ -110,44 +116,47 @@ const CustomTripDay = () => {
                 <img className="h-[400px] w-[600px]" src={data.images[0]} />
                 <div className="text-3xl">{data.destination.toUpperCase()}</div>
                 <div>Аялах хүний тоо {data.peopleCount}</div>
-                <div>
-                  Аялах өдрийн тоо {dayNumber}
-                  Аялах улирал {season}
-                </div>
               </div>
             );
           })}
         </div>
-
-        <div className="flex">
-          <div className="flex">
-            <Input
-              className="w-[100px]"
-              name="title"
-              value={input.title}
-              placeholder="ner..."
-              onChange={(e) => {
-                handleInput(e);
-              }}
-            />
-            <Input
-              className="w-[100px]"
-              name="description"
-              value={input.description}
-              placeholder="ner..."
-              onChange={(e) => {
-                handleInput(e);
-              }}
-            />
+      </div>
+      <p>Aяллын маршрут</p>
+      {days.map((count) => {
+        return (
+          <div key={count}>
+            <div className="flex">
+              <span>Day {count}</span>
+              <div className="flex">
+                <Input
+                  className="w-[100px]"
+                  name="title"
+                  value={input.title}
+                  placeholder="ner..."
+                  onChange={(e) => {
+                    handleInput(e);
+                  }}
+                />
+                <Input
+                  className="w-[100px]"
+                  name="description"
+                  value={input.description}
+                  placeholder="ner..."
+                  onChange={(e) => {
+                    handleInput(e);
+                  }}
+                />
+              </div>
+              <Button onClick={CustomTripDayCreate}>create</Button>
+            </div>
           </div>
-          <div>
-            <select>
-              <option defaultValue="owner">Owner</option>
-              <option>Зочин аялагч</option>
-            </select>
-          </div>
-          <Button onClick={CustomTripDayCreate}>create</Button>
-        </div>
+        );
+      })}
+      <div>
+        <select>
+          <option defaultValue="owner">Owner</option>
+          <option>Зочин аялагч</option>
+        </select>
       </div>
     </div>
   );

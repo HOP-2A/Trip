@@ -41,7 +41,6 @@ export const GenerateImage = ({
       setIsLoading(false);
     }
   };
-  console.log(imageUrl);
   return (
     <div>
       <Input
