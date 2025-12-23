@@ -15,13 +15,13 @@ datasource db {
 }
 
 model User {
-  id          String             @id @default(nanoid())
-  name        String?
-  email       String?            @unique
-  clerkId     String             @unique
+  id      String  @id @default(nanoid())
+  name    String
+  email   String @unique
+  clerkId String  @unique
 
-  customTrips CustomTrip[]       @relation("CustomTripCreator")
-  joinedTrips TripPlanMember[]
+  customTrips       CustomTrip[]     @relation("CustomTripCreator")
+  joinedTrips       TripPlanMember[]
   customTripMembers TripMember[]
 }
 
@@ -68,10 +68,10 @@ model TripPlan {
 }
 
 model TripPlanMember {
-  id         String   @id @default(nanoid())
+  id         String @id @default(nanoid())
   userId     String
   tripPlanId String
-  role       String   @default("member")
+  role       String @default("member")
 
   user     User     @relation(fields: [userId], references: [id])
   tripPlan TripPlan @relation(fields: [tripPlanId], references: [id])
