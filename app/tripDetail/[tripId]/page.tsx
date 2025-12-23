@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Users, MapPin, Info, Plus, Minus } from "lucide-react";
+import { Calendar, Info } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -115,7 +115,9 @@ const Page = () => {
           setTripsDayByDay(daysData);
         }
 
-        const bringTripMembers = await fetch("/api/trip/tripPlanMember");
+        const bringTripMembers = await fetch(
+          `/api/trip/tripPlanMember/${tripId}`
+        );
         if (bringTripMembers.ok) {
           const tripMemberData = await bringTripMembers.json();
           setTripMembers(tripMemberData);
@@ -200,43 +202,50 @@ const Page = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-4 space-y-6">
           {isLoading ? (
-            <BookingCardSkeleton />
-          ) : (
-            <div className="sticky top-6 border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-              <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
-
-              <div className="space-y-6">
-                <div className="flex justify-between items-center pb-4 border-b border-gray-50">
-                  <div className="flex items-center gap-3">
-                    <Pop
-                      totalPerson={totalPerson}
-                      setTotalPerson={setTotalPerson}
-                    />
-                  </div>
+            <>
+              <BookingCardSkeleton />
+              <div className="rounded-[2rem] p-8 shadow-xl bg-white">
+                <div className="space-y-4 animate-pulse">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-6 bg-gray-200 rounded w-3/4" />
+                  ))}
                 </div>
-                <Button
-                  className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
-                  onClick={joinTrip}
-                >
-                  Захиалах
-                </Button>
               </div>
-            </div>
-          )}
-          <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-            <h3 className="text-xl font-bold mb-6">New Box Title</h3>
-            <div className="space-y-4">
-              <div>
-                {tripMembers.map((tM, index) => (
-                  <div key={index}>
-                    <div>{tM.userId}</div>
+            </>
+          ) : (
+            <>
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center pb-4 border-b border-gray-50">
+                    <div className="flex items-center gap-3">
+                      <Pop
+                        totalPerson={totalPerson}
+                        setTotalPerson={setTotalPerson}
+                      />
+                    </div>
                   </div>
-                ))}
+                  <Button
+                    className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
+                    onClick={joinTrip}
+                  >
+                    Захиалах
+                  </Button>
+                </div>
               </div>
-            </div>
-          </div>
+
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
+                <div className="space-y-4">
+                  {tripMembers.map((tM, index) => (
+                    <div key={index}>~ {tM.user.name}</div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
