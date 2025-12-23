@@ -1,13 +1,13 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-export const POST = async (
+export const GET = async (
   request: Request,
   context: { params: Promise<{ tripId: string }> }
 ) => {
   const { tripId } = await context.params;
   const tripDay = await prisma.tripDay.findMany({
-    where: {             
+    where: {
       tripPlanId: tripId,
     },
   });

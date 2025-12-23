@@ -74,29 +74,14 @@ const CustomTrip = () => {
             <h1 className="text-white text-5xl font-extrabold text-center px-4">
               Шинэ газар, шинэ мэдрэмж
             </h1>
-            <div className="bg-gradient-to-r from-green-400 to-cyan-300 text-white font-semibold rounded-lg shadow-lg transition-transform">
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  push("/");
-                }}
-              >
+            <div className="bg-white/20 backdrop-blur-sm text-white border font-semibold px-4 py-2 rounded-lg shadow-lg hover:bg-white/30 transition">
+              <Button variant="ghost" onClick={() => push("/")}>
                 Home
               </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  push("/travel");
-                }}
-              >
+              <Button variant="ghost" onClick={() => push("/travel")}>
                 Travel
               </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  push("/Custom-Trip");
-                }}
-              >
+              <Button variant="ghost" onClick={() => push("/Custom-Trip")}>
                 Custom Trip
               </Button>
             </div>

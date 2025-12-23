@@ -18,6 +18,7 @@ export const useAuth = (clerkId: string | null | undefined) => {
             throw new Error("Failed to fetch user");
           }
           const data = await response.json();
+
           setUser(data);
         } catch (error) {
           setError(error as Error);
