@@ -3,8 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
-  const { startDate, endDate, peopleCount, destination, images, createdById } =
-    body;
+  const {
+    startDate,
+    endDate,
+    peopleCount,
+    destination,
+    duration,
+    images,
+    createdById,
+  } = body;
 
   const dbUser = await prisma.user.findUnique({
     where: { clerkId: createdById },
@@ -18,6 +25,7 @@ export const POST = async (req: NextRequest) => {
     data: {
       startDate,
       endDate,
+      duration,
       peopleCount,
       destination,
       images,

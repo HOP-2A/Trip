@@ -11,7 +11,7 @@ import { GenerateImage } from "../_components/GenerateImg";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
 
-type CustomTripType = {
+export type CustomTripType = {
   id: string;
   startDate: string;
   endDate: string;
@@ -19,6 +19,7 @@ type CustomTripType = {
   destination: string;
   images: string[];
   createdById: string;
+  duration: number;
 };
 
 const CustomTrip = () => {
@@ -41,11 +42,20 @@ const CustomTrip = () => {
   };
 
   const CustomTripCreate = async () => {
+    if (!duration?.from || !duration?.to) return;
+    const startDate = duration?.from?.toISOString();
+    const endDate = duration?.to?.toISOString();
+    const amount = Math.floor(
+      (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+        (1000 * 60 * 60 * 24)
+    );
+    
     await fetch("/api/trip/tripPost/customTrip", {
       method: "POST",
       body: JSON.stringify({
-        startDate: duration?.from?.toISOString(),
-        endDate: duration?.to?.toISOString(),
+        startDate,
+        endDate,
+        duration: amount,
         peopleCount: totalPerson,
         destination: input,
         images: imageUrl,
