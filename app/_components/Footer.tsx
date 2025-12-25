@@ -16,10 +16,13 @@ export const Footer = () => {
                 <p>- Болорсайхан</p>
                 <p>- Энхсайхан</p>
               </div>
-            </div>
+            </div> 
+
+
           </div>
         </div>
-
+    
+        <div className="text-sm text-white pt-8">Найдвартай найрсаг хамт олон таныг хүлээж байна.</div>
         <div className="mt-12 border-t border-white pt-6 flex flex-col items-center justify-between gap-4">
           <p className="text-xs text-gray-400">
             © 2025 Pinecone-ны turuugiinmaanaguud ангийн нэг уран бүтээл
