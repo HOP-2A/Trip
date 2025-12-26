@@ -1,8 +1,12 @@
 "use client";
 
-import { Calendar, Info } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import * as React from "react";
+import { Info } from "lucide-react";
+
+import { DateRange } from "react-day-picker";
+
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +17,15 @@ import { Button } from "@/components/ui/button";
 import { Pop } from "@/app/_components/Popover";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
+import { ChevronDownIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 type Trip = {
   id: string;
   title: string;
@@ -76,10 +89,12 @@ const Page = () => {
   const [tripMembers, setTripMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
+  const [open, setOpen] = React.useState(false);
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [saveDay, setSaveDay] = useState<Date | undefined>();
 
   const params = useParams();
   const { tripId } = params;
-
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
@@ -92,7 +107,10 @@ const Page = () => {
       }),
     });
   };
-
+  const handeCalender = (selectedDate: Date | undefined) => {
+    if (!selectedDate) return setSaveDay;
+  };
+  console.log(saveDay);
   useEffect(() => {
     if (!tripId) return;
 
@@ -159,7 +177,6 @@ const Page = () => {
                   {trip.destination} ~ {trip.title}
                 </h1>
                 <div className="flex items-center gap-2 text-gray-500">
-                  <Calendar className="w-5 h-5 text-blue-500" />
                   <span>{formatDate(trip.startDate)}</span>
                 </div>
               </div>
@@ -217,20 +234,50 @@ const Page = () => {
           ) : (
             <>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-2xl font-bold mb-4 text-gray-500">
-                  Захиалгын мэдээлэл
-                </h3>
-                <hr></hr>
-                <Calendar />
+                <div className="">
+                  <h3 className="text-xl font-bold text-gray-500 whitespace-nowrap pr-12 pl-10 ">
+                    Захиалгын мэдээлэл
+                  </h3>
+
+                  <hr className=""></hr>
+                </div>
+                <div className="flex flex-col gap-3 pt-3">
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        id="date"
+                        className="w-48 justify-between font-normal"
+                      >
+                        {date ? date.toLocaleDateString() : "Select date"}
+                        <ChevronDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          setDate(date);
+                          setOpen(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
                 <div>{}</div>
                 <div className="space-y-6">
-                  <div className="flex justify-between items-center pb-4 border-b border-gray-50">
-                    <div className="flex items-center gap-3">
-                      <Pop
-                        totalPerson={totalPerson}
-                        setTotalPerson={setTotalPerson}
-                      />
-                    </div>
+                  <div className="flex justify-between items-center border-gray-50"></div>
+                  <div className="flex items-center gap-3">
+                    <Pop
+                      totalPerson={totalPerson}
+                      setTotalPerson={setTotalPerson}
+                    />
                   </div>
                   <Button
                     className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
