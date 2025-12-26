@@ -23,6 +23,16 @@ model User {
   customTrips       CustomTrip[]     @relation("CustomTripCreator")
   joinedTrips       TripPlanMember[]
   customTripMembers TripMember[]
+  tripComment       TripComment[]
+}
+
+model TripComment {
+  id         String    @id @default(nanoid())
+  comment    String
+  userId     String?
+  tripPlanId String?
+  user       User?     @relation(fields: [userId], references: [id])
+  tripPlan   TripPlan? @relation(fields: [tripPlanId], references: [id])
 }
 
 model CustomTrip {
@@ -64,8 +74,9 @@ model TripPlan {
 
   createdAt DateTime @default(now())
 
-  days    TripDay[]
-  members TripPlanMember[]
+  days        TripDay[]
+  members     TripPlanMember[]
+  tripComment TripComment[]
 }
 
 model TripPlanMember {
@@ -98,4 +109,34 @@ model TripDay {
   description String?
 
   tripPlan TripPlan @relation(fields: [tripPlanId], references: [id])
+}
+
+model Fact {
+  id          String              @id @default(nanoid())
+  destination String
+  description String
+  currency    String
+  visa        String
+  language    String
+  warning     String
+  food        mustEatFood[]
+  place       mustVisitLocation[]
+}
+
+model mustEatFood {
+  id          String   @id @default(nanoid())
+  title       String
+  description String
+  images      String[]
+  fact        Fact?    @relation(fields: [factId], references: [id])
+  factId      String?
+}
+
+model mustVisitLocation {
+  id          String   @id @default(nanoid())
+  title       String
+  description String
+  images      String[]
+  fact        Fact?    @relation(fields: [factId], references: [id])
+  factId      String?
 }

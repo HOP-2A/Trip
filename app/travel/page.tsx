@@ -88,7 +88,7 @@ export default function FeaturedTrips() {
       </div>
 
       <div className="w-full max-w-7xl mx-auto mt-10 px-4">
-        <h2 className="text-2xl font-bold mb-6">Онцлох аяллууд</h2>
+        <h2 className="text-2xl font-bold mb-6">Аяллууд</h2>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {isLoading
