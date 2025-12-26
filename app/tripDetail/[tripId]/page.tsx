@@ -1,8 +1,12 @@
 "use client";
 
-import { Calendar, Info } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import * as React from "react";
+import { Info } from "lucide-react";
+
+import { DateRange } from "react-day-picker";
+
 import {
   Accordion,
   AccordionContent,
@@ -12,6 +16,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
+import { ChevronDownIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 type Trip = {
   id: string;
   title: string;
@@ -88,7 +101,6 @@ const Page = () => {
 
   const params = useParams();
   const { tripId } = params;
-
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
