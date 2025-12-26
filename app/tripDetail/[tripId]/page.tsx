@@ -254,6 +254,7 @@ const Page = () => {
                 </div>
               </div>
 
+               
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
                 {tripMembers.length > 0 && (
@@ -264,6 +265,23 @@ const Page = () => {
                   </div>
                 )}
               </div>
+
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Сонирхолтой баримтууд</h3>
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center pb-4 border-b border-gray-50">
+                    <div className="flex items-center gap-3">
+                     <img
+              src={""}
+              alt=""
+              
+            />
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+
             </>
           )}
         </div>
