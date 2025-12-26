@@ -14,10 +14,22 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Input } from "@/components/ui/input";
 
 =======
 >>>>>>> e0f4f71 (UI)
+=======
+import { ChevronDownIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+>>>>>>> 555b85f (ad)
 type Trip = {
   id: string;
   title: string;
@@ -98,7 +110,6 @@ const Page = () => {
 
   const params = useParams();
   const { tripId } = params;
-
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
@@ -210,8 +221,12 @@ const Page = () => {
                   {trip.destination} ~ {trip.title}
                 </h1>
                 <div className="flex items-center gap-2 text-gray-500">
+<<<<<<< HEAD
                   <Calendar className="w-5 h-5 text-[#2e5d4d]" />
                   <span>Эхлэл хугацаа: {formatDate(trip.startDate)}</span>
+=======
+                  <span>{formatDate(trip.startDate)}</span>
+>>>>>>> 2d26cff (ad)
                 </div>
               </div>
             </div>
@@ -268,11 +283,42 @@ const Page = () => {
           ) : (
             <>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-2xl font-bold mb-4 text-gray-500">
-                  Захиалгын мэдээлэл
-                </h3>
-                <hr></hr>
-                <Calendar />
+                <div className="">
+                  <h3 className="text-xl font-bold text-gray-500 whitespace-nowrap pr-12 pl-10 ">
+                    Захиалгын мэдээлэл
+                  </h3>
+
+                  <hr className=""></hr>
+                </div>
+                <div className="flex flex-col gap-3 pt-3">
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        id="date"
+                        className="w-48 justify-between font-normal"
+                      >
+                        {date ? date.toLocaleDateString() : "Select date"}
+                        <ChevronDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          setDate(date);
+                          setOpen(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
                 <div>{}</div>
                 <div className="space-y-6">
                   <Button
