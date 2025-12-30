@@ -118,7 +118,6 @@ model Fact {
   currency    String
   visa        String
   language    String
-  warning     String
   food        mustEatFood[]
   place       mustVisitLocation[]
 }
