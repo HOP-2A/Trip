@@ -1,4 +1,5 @@
 "use client";
+
 type customTripType = {
   destination: string;
   endDate: string;
@@ -20,8 +21,12 @@ export type days = {
 };
 
 import DynamicCreateForm from "@/app/_components/Form";
+import { SelectDemo } from "@/app/_components/Select";
+import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 
 const Page = () => {
   const params = useParams();
@@ -29,6 +34,8 @@ const Page = () => {
   const [getData, setGetData] = useState<customTripType[]>([]);
   const [days, setDays] = useState<days[]>([]);
   const [duration, setDuration] = useState<number>(0);
+  const { user: clerkId } = useUser();
+  const { user } = useAuth(clerkId?.id);
 
   const getCustomTripData = async () => {
     const res = await fetch(`/api/trip/tripPost/customTripDay/${DayId}`);
@@ -43,6 +50,18 @@ const Page = () => {
   useEffect(() => {
     getCustomTripData();
   }, []);
+
+  const isOwner = getData.length > 0 && getData[0].createdById === user?.id;
+
+  const CreateGuest = async () => {
+    await fetch("/api/trip/tripMember", {
+      method: "POST",
+      body: JSON.stringify({
+        memberId: user?.id,
+        customtripId: DayId,
+      }),
+    });
+  };
 
   return (
     <div>
@@ -61,10 +80,14 @@ const Page = () => {
         <DynamicCreateForm days={days} duration={duration} dayId={DayId} />
       </div>
       <div>
-        <select>
-          <option defaultValue="owner">Owner</option>
-          <option>Зочин аялагч</option>
-        </select>
+        {isOwner ? (
+          <div>chi creator bizde</div>
+        ) : (
+          <div>
+            Aylald negdeh
+            <Button onClick={CreateGuest}>Create</Button>
+          </div>
+        )}
       </div>
     </div>
   );
