@@ -26,14 +26,14 @@ model User {
   tripComment       TripComment[]
 }
 
-model TripComment {
-  id         String    @id @default(nanoid())
-  comment    String
-  userId     String?
-  tripPlanId String?
-  user       User?     @relation(fields: [userId], references: [id])
-  tripPlan   TripPlan? @relation(fields: [tripPlanId], references: [id])
-}
+  model TripComment {
+    id         String    @id @default(nanoid())
+    comment    String
+    userId     String?
+    tripPlanId String?
+    user       User?     @relation(fields: [userId], references: [id])
+    tripPlan   TripPlan? @relation(fields: [tripPlanId], references: [id])
+  }
 
 model CustomTrip {
   id          String    @id @default(nanoid())
