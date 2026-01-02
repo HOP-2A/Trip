@@ -15,16 +15,18 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(nanoid())
-  name     String
-  email    String @unique
-  clerkId  String @unique
-  imageUrl String?
+  id                String           @id @default(nanoid())
+  name              String
+  email             String           @unique
+  clerkId           String           @unique
+  imageUrl          String?
   customTrips       CustomTrip[]     @relation("CustomTripCreator")
   joinedTrips       TripPlanMember[]
   customTripMembers TripMember[]
   tripComment       TripComment[]
-  invitedMembers    InvitedMember[]
+
+  invitedMembers  InvitedMember[] @relation("InviterRelation")
+  receivedInvites InvitedMember[] @relation("InvitedRelation")
 }
 
 model TripComment {
@@ -65,13 +67,16 @@ model TripMember {
 
   @@unique([userId, customTripId])
 }
+
 model InvitedMember {
   id            String @id @default(nanoid())
   userId        String
   customTripId  String
   invitedUserId String
 
-  user       User       @relation(fields: [userId], references: [id])
+  inviterUser User @relation("InviterRelation", fields: [userId], references: [id])
+  invitedUser User @relation("InvitedRelation", fields: [invitedUserId], references: [id])
+
   customTrip CustomTrip @relation(fields: [customTripId], references: [id])
 }
 
