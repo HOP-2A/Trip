@@ -2,15 +2,15 @@ import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
-  const { customtripId, memberId } = await req.json();
-  if (!customtripId || !memberId) {
+  const { customTripId, memberId } = await req.json();
+  if (!customTripId || !memberId) {
     return NextResponse.json("aldaa");
   }
   const NewTripMember = await prisma.tripMember.create({
     data: {
       userId: memberId,
       role: "member",
-      customTripId: customtripId,
+      customTripId,
     },
   });
 

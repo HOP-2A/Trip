@@ -21,7 +21,6 @@ export type days = {
 };
 
 import DynamicCreateForm from "@/app/_components/Form";
-import { SelectDemo } from "@/app/_components/Select";
 import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -58,7 +57,7 @@ const Page = () => {
       method: "POST",
       body: JSON.stringify({
         memberId: user?.id,
-        customtripId: DayId,
+        customTripId: DayId,
       }),
     });
   };
@@ -81,7 +80,10 @@ const Page = () => {
       </div>
       <div>
         {isOwner ? (
-          <div>chi creator bizde</div>
+          <div>
+            chi creator bizde
+            <Button>aylald hun urih</Button>
+          </div>
         ) : (
           <div>
             Aylald negdeh

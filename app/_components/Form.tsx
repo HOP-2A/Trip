@@ -63,6 +63,7 @@ export default function DynamicCreateForm({
         dayNumber: index + 1,
       }),
     });
+    window.location.reload();
   };
 
   const c = (index: number) => {
