@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, Info } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   Accordion,
@@ -10,7 +10,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Pop } from "@/app/_components/Popover";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -31,7 +30,7 @@ type TripDay = {
 
 type TripMember = {
   id: string;
-  userId: string;
+  user: string;
   tripPlanId: string;
   role: string;
 };
@@ -84,6 +83,8 @@ const Page = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
   const [tripComment, setTripComment] = useState([]);
+
+  const { push } = useRouter();
 
   const params = useParams();
   const { tripId } = params;
@@ -164,7 +165,6 @@ const Page = () => {
     loadData();
   }, [tripId]);
 
-
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
       <div className="mb-8">
@@ -192,8 +192,8 @@ const Page = () => {
                   {trip.destination} ~ {trip.title}
                 </h1>
                 <div className="flex items-center gap-2 text-gray-500">
-                  <Calendar className="w-5 h-5 text-blue-500" />
-                  <span>{formatDate(trip.startDate)}</span>
+                  <Calendar className="w-5 h-5 text-[#2e5d4d]" />
+                  <span>Эхлэл хугацаа: {formatDate(trip.startDate)}</span>
                 </div>
               </div>
             </div>
@@ -201,7 +201,7 @@ const Page = () => {
 
           <div className="mt-10">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <Info className="w-6 h-6 text-blue-600" /> Аяллын хөтөлбөр
+              <Info className="w-6 h-6 text-[#2e5d4d]" /> Аяллын хөтөлбөр
             </h2>
 
             {isLoading ? (
@@ -218,7 +218,7 @@ const Page = () => {
                     <AccordionItem value={day.id} className="border-none">
                       <AccordionTrigger className="px-5 py-4 hover:no-underline font-bold text-lg">
                         <div className="flex items-center gap-3">
-                          <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-sm">
+                          <span className="bg-green-50 text-[#2e5d4d] px-3 py-1 rounded-lg text-sm">
                             Өдөр {index + 1}
                           </span>
                           <span>{day.title}</span>
@@ -253,7 +253,7 @@ const Page = () => {
                 <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
                 <div className="space-y-6">
                   <Button
-                    className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
+                    className="w-full py-4 bg-[#2e5d4d] text-white rounded-2xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
                     onClick={joinTrip}
                   >
                     Захиалах
@@ -261,50 +261,51 @@ const Page = () => {
                 </div>
               </div>
 
-               
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
                 {tripMembers.length > 0 && (
                   <div className="space-y-4">
                     {tripMembers.map((tM, index) =>
-                      tM.user ? <div key={index}>~ {tM.user.name}</div> : null
+                      tM.user ? (
+                        <div key={index}>
+                          <Button
+                            variant="ghost"
+                            onClick={() => push(`/profile/${tM.user?.id}`)}
+                          >
+                            - {tM.user.name}
+                          </Button>
+                        </div>
+                      ) : null
                     )}
                   </div>
                 )}
               </div>
 
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">Сонирхолтой баримтууд</h3>
+                <h3 className="text-xl font-bold mb-6">
+                  Сонирхолтой баримтууд
+                </h3>
                 <div className="space-y-6">
                   <div className="flex justify-between items-center pb-4 border-b border-gray-50">
                     <div className="flex items-center gap-3">
-                     <img
-              src={""}
-              alt=""
-              
-            />
+                      <img src={""} alt="" />
                     </div>
                   </div>
-                  
                 </div>
               </div>
 
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">Сонирхолтой баримтууд</h3>
+                <h3 className="text-xl font-bold mb-6">
+                  Сонирхолтой баримтууд
+                </h3>
                 <div className="space-y-6">
                   <div className="flex justify-between items-center pb-4 border-b border-gray-50">
                     <div className="flex items-center gap-3">
-                     <img
-              src={""}
-              alt=""
-              
-            />
+                      <img src={""} alt="" />
                     </div>
                   </div>
-                  
                 </div>
               </div>
-
             </>
           )}
         </div>
