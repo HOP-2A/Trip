@@ -83,7 +83,7 @@ export default function DynamicCreateForm({
               </>
             ) : (
               <>
-                <h3 className="font-semibold">{index + 1}. Item</h3>
+                <h3 className="font-semibold">Day {index + 1}</h3>
                 <input
                   className="border px-2 py-1 w-full rounded"
                   placeholder={`Title ${index + 1}`}

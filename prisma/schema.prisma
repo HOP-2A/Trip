@@ -15,15 +15,18 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(nanoid())
-  name     String
-  email    String @unique
-  clerkId  String @unique
-  imageUrl String?
+  id                String           @id @default(nanoid())
+  name              String
+  email             String           @unique
+  clerkId           String           @unique
+  imageUrl          String?
   customTrips       CustomTrip[]     @relation("CustomTripCreator")
   joinedTrips       TripPlanMember[]
   customTripMembers TripMember[]
   tripComment       TripComment[]
+
+  invitedMembers  InvitedMember[] @relation("InviterRelation")
+  receivedInvites InvitedMember[] @relation("InvitedRelation")
 }
 
 model TripComment {
@@ -48,8 +51,9 @@ model CustomTrip {
   createdBy   User?    @relation("CustomTripCreator", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
 
-  days    CustomTripDay[]
-  members TripMember[]
+  days           CustomTripDay[]
+  members        TripMember[]
+  invitedMembers InvitedMember[]
 }
 
 model TripMember {
@@ -62,6 +66,18 @@ model TripMember {
   customTrip CustomTrip @relation(fields: [customTripId], references: [id])
 
   @@unique([userId, customTripId])
+}
+
+model InvitedMember {
+  id            String @id @default(nanoid())
+  userId        String
+  customTripId  String
+  invitedUserId String
+
+  inviterUser User @relation("InviterRelation", fields: [userId], references: [id])
+  invitedUser User @relation("InvitedRelation", fields: [invitedUserId], references: [id])
+
+  customTrip CustomTrip @relation(fields: [customTripId], references: [id])
 }
 
 model TripPlan {
