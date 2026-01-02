@@ -110,7 +110,7 @@ export default function FeaturedTrips() {
                       {trip.title}
                     </h3>
                     <div className="text-sm text-gray-600">
-                      {formatDate(trip.startDate)}
+                      Эхлэх хугацаа: {formatDate(trip.startDate)}
                     </div>
                   </div>
                 </div>

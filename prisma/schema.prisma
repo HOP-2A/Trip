@@ -19,7 +19,7 @@ model User {
   name     String
   email    String @unique
   clerkId  String @unique
-  imageUrl String
+  imageUrl String?
   customTrips       CustomTrip[]     @relation("CustomTripCreator")
   joinedTrips       TripPlanMember[]
   customTripMembers TripMember[]

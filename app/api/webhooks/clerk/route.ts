@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
   const email = user.email_addresses?.[0]?.email_address ?? null;
   const name = user.first_name || "";
-  const imageUrl = user.image_url || null;
+  const imageUrl = user.image_url || "defaultPfp.jpg";
 
   if (eventType === "user.created") {
     await prisma.user.create({
