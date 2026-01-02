@@ -126,6 +126,7 @@ const CustomTrip = () => {
           <Button
             onClick={() => {
               CustomTripCreate();
+              setImageUrl([]);
             }}
           >
             Create
@@ -160,21 +161,18 @@ const CustomTrip = () => {
           })}
         </div>
       </div>
-      {imageUrl && (
-        <div>
-          <div className="text-xl font-semibold text-gray-800">
-            Your generated Image
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            {imageUrl.map((url) => (
-              <img
-                key={url}
-                className="w-full h-auto rounded-lg shadow-md "
-                src={url}
-              />
-            ))}
-          </div>
+      {imageUrl ? (
+        <div className="bg-gray-50 p-4 rounded-lg">
+          {imageUrl.map((url) => (
+            <img
+              key={url}
+              className="w-full h-auto rounded-lg shadow-md "
+              src={url}
+            />
+          ))}
         </div>
+      ) : (
+        ""
       )}
     </div>
   );

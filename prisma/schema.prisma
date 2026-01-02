@@ -24,6 +24,7 @@ model User {
   joinedTrips       TripPlanMember[]
   customTripMembers TripMember[]
   tripComment       TripComment[]
+  invitedMembers    InvitedMember[]
 }
 
 model TripComment {
@@ -48,8 +49,9 @@ model CustomTrip {
   createdBy   User?    @relation("CustomTripCreator", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
 
-  days    CustomTripDay[]
-  members TripMember[]
+  days           CustomTripDay[]
+  members        TripMember[]
+  invitedMembers InvitedMember[]
 }
 
 model TripMember {
@@ -62,6 +64,15 @@ model TripMember {
   customTrip CustomTrip @relation(fields: [customTripId], references: [id])
 
   @@unique([userId, customTripId])
+}
+model InvitedMember {
+  id            String @id @default(nanoid())
+  userId        String
+  customTripId  String
+  invitedUserId String
+
+  user       User       @relation(fields: [userId], references: [id])
+  customTrip CustomTrip @relation(fields: [customTripId], references: [id])
 }
 
 model TripPlan {
