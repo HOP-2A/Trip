@@ -85,7 +85,7 @@ const CustomTrip = () => {
         </div>
         <div className="relative">
           <img
-            src={"airBalloon.jpeg"}
+            src={"3.jpeg"}
             alt="Nature Photo"
             className="w-full h-[600px] object-cover object-center"
           />
