@@ -89,41 +89,41 @@ export const POST = async () => {
   factId:"a2pfTGcgrAJXE-xLZKLFS"
 },
 {
-  title:"",
-  description:"",
-  images:[""],
+  title:"Colosseum",
+  description:"Итали улсын Ром хотод байрлах эртний Ромын хүрээлэн, түүхэн архитектур, соёлын өвөрмөц үнэ цэнээрээ алдартай.",
+  images:["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXOJx8k9uykyqZKJOp1JsPm5lpJW0iJ9iLVQ&s"],
   factId:"drztlni6k_X56iXggsXHT"
 
 },
 {
-  title:"",
-  description:"",
-  images:[""],
-  factId:""
+  title:"Gyeongbokgung Palace",
+  description:"БНСУ-ын Сөүл хотод байрлах түүхэн хааны ордон, уламжлалт архитектур, соёлын өвөрмөц гоёмсог байдалтай.",
+  images:["https://ucarecdn.com/2667d034-3197-4c39-b162-579a4e2e583a/-/crop/1920x1007/0,72/-/resize/1200x630/"],
+  factId:"dvqh1Lr_1dUL1xE0icZ5Y"
 },
 {
-  title:"",
-  description:"",
-  images:[""],
-  factId:""
+  title:"Sagrada Família –",
+  description:"Испанийн Барселона хотод байрлах алдартай сүм, гоёмсог архитектур, Антони Гаудигийн бүтээлийн өвөрмөц хэв маягаар алдартай.",
+  images:["https://images.adsttc.com/media/images/5254/4190/e8e4/4eff/0200/06cf/large_jpg/sfpassio.jpg?1381253501"],
+  factId:"m_PIq2Cyh6z7vg-FSWZW0"
 },
 {
-  title:"",
-  description:"",
-  images:[""],
-  factId:""
+  title:"Gobi Desert",
+  description:" Монгол Улсад байрлах алдартай цөл, өргөн уудам нутаг, өвөрмөц байгалийн ландшафт, аялал жуулчлалын өвөрмөц боломжоороо танигдсан.",
+  images:["https://www.discovermongolia.mn/uploads/gallery-khongor-sand-dunes-camel.jpg"],
+  factId:"wNl56nGXuGVjCtAYO_CLo"
 },
 {
-  title:"",
-  description:"",
-  images:[""],
-  factId:""
+  title:"Borobudur Temple",
+  description:"Индонезийн Ява аралд байрлах дэлхийн хамгийн том буддын сүм, түүхэн өв, нарийн ур хийц, гоёмсог рельефээрээ алдартай.",
+  images:["https://www.mystreal.com/_next/image/?url=%2Ftemple%2Fborobudur-temple%2FScene-1-The-Lost-Origins-of-Borobudur-2.webp&w=3840&q=75"],
+  factId:"x8T-p2Gqq6PxcUPpIBbW6"
 },
 {
-  title:"",
-  description:"",
-  images:[""],
-  factId:""
+  title:"Great Wall of China",
+  description:"Хятадын хамгийн алдартай түүхэн байгууламж, урт хана, эртний хамгаалалтын систем болон гайхалтай байгалийн үзэмжээрээ алдартай.",
+  images:["https://www.popsci.com/wp-content/uploads/2025/02/Great-Wall-China.jpg?quality=85&w=2000"],
+  factId:"ys5HzKAbzOsfGLZGKIGTV"
 },
 
 
