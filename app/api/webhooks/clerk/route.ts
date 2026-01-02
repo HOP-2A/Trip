@@ -30,6 +30,7 @@ export async function POST(req: Request) {
 
   const email = user.email_addresses?.[0]?.email_address ?? null;
   const name = user.first_name || "";
+  const imageUrl = user.image_url || null;
 
   if (eventType === "user.created") {
     await prisma.user.create({
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
         clerkId: user.id,
         email,
         name,
+        imageUrl,
       },
     });
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, Info } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   Accordion,
@@ -30,7 +30,7 @@ type TripDay = {
 
 type TripMember = {
   id: string;
-  userId: string;
+  user: string;
   tripPlanId: string;
   role: string;
 };
@@ -83,6 +83,8 @@ const Page = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
   const [tripComment, setTripComment] = useState([]);
+
+  const { push } = useRouter();
 
   const params = useParams();
   const { tripId } = params;
@@ -266,7 +268,16 @@ const Page = () => {
                 {tripMembers.length > 0 && (
                   <div className="space-y-4">
                     {tripMembers.map((tM, index) =>
-                      tM.user ? <div key={index}>~ {tM.user.name}</div> : null
+                      tM.user ? (
+                        <div key={index}>
+                          <Button
+                            variant="ghost"
+                            onClick={() => push(`/profile/${tM.user?.id}`)}
+                          >
+                            - {tM.user.name}
+                          </Button>
+                        </div>
+                      ) : null
                     )}
                   </div>
                 )}
