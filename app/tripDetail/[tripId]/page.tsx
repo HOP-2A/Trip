@@ -10,7 +10,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Pop } from "@/app/_components/Popover";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
 
