@@ -10,6 +10,7 @@ import { Pop } from "../_components/Popover";
 import { GenerateImage } from "../_components/GenerateImg";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
+import { formatDate } from "date-fns";
 
 export type CustomTripType = {
   id: string;
@@ -49,7 +50,7 @@ const CustomTrip = () => {
       (new Date(endDate).getTime() - new Date(startDate).getTime()) /
         (1000 * 60 * 60 * 24)
     );
-    
+
     await fetch("/api/trip/tripPost/customTrip", {
       method: "POST",
       body: JSON.stringify({
@@ -62,7 +63,15 @@ const CustomTrip = () => {
         createdById: clerkUser?.id,
       }),
     });
+    await BringCustomTrip();
   };
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
 
   useEffect(() => {
     BringCustomTrip();
@@ -142,7 +151,7 @@ const CustomTrip = () => {
                     className="p-4 space-y-2"
                   >
                     <div className="text-sm text-gray-600">
-                      {bring.startDate}
+                      {formatDate(bring.startDate)}
                     </div>
                   </div>
                 </div>
