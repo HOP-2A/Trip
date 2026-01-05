@@ -277,16 +277,6 @@ const Page = () => {
                     )}
                   </div>
                 )}
-<<<<<<< HEAD
-=======
-              </div>
-<<<<<<< HEAD
-
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">
-                  Сонирхолтой баримтууд
-                </h3>
->>>>>>> 9dc6264 (arai duusagu)
                 <div className="space-y-6">
                   <Button
                     className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer
@@ -312,7 +302,6 @@ const Page = () => {
                       <img src={""} alt="" />
                     </div>
                   </div>
-=======
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Сэтгэгдэл </h3>
                 <div className="flex gap-3">
@@ -325,7 +314,6 @@ const Page = () => {
                     }}
                   />
                   <Send onClick={tripDetailComment}>send</Send>
->>>>>>> f948f8e (arai duusagu)
                 </div>
               </div>
             </>
