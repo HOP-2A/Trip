@@ -13,6 +13,20 @@ type customTripType = {
   days: days[];
 };
 
+type InviteUserType = {
+  id: string;
+  userId: string;
+  customTripId: string;
+  invitedUserId: string;
+};
+
+type UserType = {
+  id: string;
+  name: string;
+  email: string;
+  clerkId: string;
+};
+
 export type days = {
   dayNumber: number;
   title: string;
@@ -35,6 +49,7 @@ const Page = () => {
   const [duration, setDuration] = useState<number>(0);
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
+  const [allUser, setAllUser] = useState<UserType[]>([]);
 
   const getCustomTripData = async () => {
     const res = await fetch(`/api/trip/tripPost/customTripDay/${DayId}`);
@@ -45,10 +60,6 @@ const Page = () => {
     setDays(days);
     setDuration(response[0].duration);
   };
-
-  useEffect(() => {
-    getCustomTripData();
-  }, []);
 
   const isOwner = getData.length > 0 && getData[0].createdById === user?.id;
 
@@ -61,6 +72,29 @@ const Page = () => {
       }),
     });
   };
+
+  const AllMember = async () => {
+    const response = await fetch("/api/user");
+    const allUser = await response.json();
+    setAllUser(allUser);
+  };
+  console.log(allUser);
+
+  const InviteMember = async (userId: string) => {
+    await fetch("/api/trip/InviteUser", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: user?.id,
+        customTripId: DayId,
+        invitedUserId: userId,
+      }),
+    });
+  };
+
+  useEffect(() => {
+    getCustomTripData();
+    AllMember();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
@@ -95,6 +129,17 @@ const Page = () => {
           <Button onClick={CreateGuest}>Create</Button>
         </div>
       )}
+      <div>
+        {allUser.map((user, index) => {
+          return (
+            <div key={index}>
+              <span>{user.id}</span>
+              <p>{user.name.toUpperCase()}</p>
+              <Button onClick={() => InviteMember(user.id)}>Invite</Button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
