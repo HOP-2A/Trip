@@ -63,34 +63,38 @@ const Page = () => {
   };
 
   return (
-    <div>
-      {getData.map((data, index) => {
-        return (
-          <div key={index}>
-            <img className="h-[400px] w-[600px]" src={data.images[0]} />
-            <div className="text-3xl">{data.destination.toUpperCase()}</div>
-            <div>Аялах хүний тоо {data.peopleCount}</div>
-            <div>Аялах өдрийн тоо {duration}</div>
-          </div>
-        );
-      })}
-      <p>Aяллын маршрут</p>
-      <div>
-        <DynamicCreateForm days={days} duration={duration} dayId={DayId} />
+    <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
+      <div className="mb-8">
+        {getData.map((data, index) => {
+          return (
+            <div key={index}>
+              <div className="relative h-[400px] w-full overflow-hidden rounded-3xl shadow-lg">
+                <img
+                  src={data.images[0]}
+                  alt="Trip banner"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="text-3xl">{data.destination.toUpperCase()}</div>
+              <div>Аялах хүний тоо {data.peopleCount}</div>
+              <div>Аялах өдрийн тоо {duration}</div>
+            </div>
+          );
+        })}
       </div>
-      <div>
-        {isOwner ? (
-          <div>
-            chi creator bizde
-            <Button>aylald hun urih</Button>
-          </div>
-        ) : (
-          <div>
-            Aylald negdeh
-            <Button onClick={CreateGuest}>Create</Button>
-          </div>
-        )}
-      </div>
+      <DynamicCreateForm days={days} duration={duration} dayId={DayId} />
+
+      {isOwner ? (
+        <div>
+          chi creator bizde
+          <Button>aylald hun urih</Button>
+        </div>
+      ) : (
+        <div>
+          Aylald negdeh
+          <Button onClick={CreateGuest}>Create</Button>
+        </div>
+      )}
     </div>
   );
 };

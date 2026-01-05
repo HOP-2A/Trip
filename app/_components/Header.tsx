@@ -13,6 +13,12 @@ export const Header = () => {
 
   useEffect(() => {
     const isTripDetailPage = pathname.startsWith("/tripDetail/");
+    const isCustomTripPage = pathname.startsWith("/Custom-Trip/");
+
+    if (isCustomTripPage) {
+      setScrolled(true);
+      return;
+    }
 
     if (isTripDetailPage) {
       setScrolled(true);

@@ -10,7 +10,6 @@ import { Pop } from "../_components/Popover";
 import { GenerateImage } from "../_components/GenerateImg";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
-import { formatDate } from "date-fns";
 
 export type CustomTripType = {
   id: string;
@@ -132,33 +131,39 @@ const CustomTrip = () => {
             Create
           </Button>
         </div>
-        <DialogDemo />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {bringData.map((bring) => {
-            return (
-              <div
-                key={bring.id}
-                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
-              >
-                <img
-                  src={bring.images[0]}
-                  className="w-full h-40 object-cover"
-                />
-                <div>
-                  <div
-                    onClick={() => {
-                      push(`/Custom-Trip/${bring.id}`);
-                    }}
-                    className="p-4 space-y-2"
-                  >
-                    <div className="text-sm text-gray-600">
-                      {formatDate(bring.startDate)}
+        <div className="pl-5 m-2">
+          <DialogDemo />
+        </div>
+
+        <div className="w-full max-w-7xl mx-auto mt-10 px-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {bringData.map((bring) => {
+              return (
+                <div
+                  key={bring.id}
+                  className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+                  onClick={() => {
+                    push(`/Custom-Trip/${bring.id}`);
+                  }}
+                >
+                  <img
+                    src={bring.images[0]}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div>
+                    <div className="p-4 space-y-2">
+                      <h3 className="font-semibold text-lg leading-snug">
+                        {bring.destination.toLocaleUpperCase()}
+                      </h3>
+                      <div className="text-sm text-gray-600">
+                        Эхлэл хугацаа: {formatDate(bring.startDate)}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
       {imageUrl ? (
