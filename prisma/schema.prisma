@@ -20,6 +20,7 @@ model User {
   email             String           @unique
   clerkId           String           @unique
   imageUrl          String?
+  role              String           @default("user")
   customTrips       CustomTrip[]     @relation("CustomTripCreator")
   joinedTrips       TripPlanMember[]
   customTripMembers TripMember[]
@@ -87,6 +88,7 @@ model TripPlan {
   startDate   DateTime?
   endDate     DateTime?
   images      String[]
+  info        Fact[]
 
   createdAt DateTime @default(now())
 
@@ -136,6 +138,8 @@ model Fact {
   language    String
   food        mustEatFood[]
   place       mustVisitLocation[]
+  tripPlan    TripPlan?           @relation(fields: [tripPlanId], references: [id])
+  tripPlanId  String?
 }
 
 model mustEatFood {

@@ -31,15 +31,56 @@ export async function POST(req: Request) {
   const email = user.email_addresses?.[0]?.email_address ?? null;
   const name = user.first_name || "";
   const imageUrl = user.image_url || "defaultPfp.jpg";
+  const isAdmin = user.public_metadata?.isAdmin === true;
+  const role = isAdmin ? "admin" : "user";
 
-  if (eventType === "user.created") {
-    await prisma.user.create({
-      data: {
-        clerkId: user.id,
-        email,
-        name,
-        imageUrl,
-      },
+  try {
+    if (eventType === "user.created") {
+      await prisma.user.upsert({
+        where: { clerkId: user.id },
+        update: {
+          email,
+          name,
+          imageUrl,
+          role,
+        },
+        create: {
+          clerkId: user.id,
+          email,
+          name,
+          imageUrl,
+          role,
+        },
+      });
+    } else if (eventType === "user.updated") {
+      await prisma.user.upsert({
+        where: { clerkId: user.id },
+        update: {
+          email,
+          name,
+          imageUrl,
+          role,
+        },
+        create: {
+          clerkId: user.id,
+          email,
+          name,
+          imageUrl,
+          role,
+        },
+      });
+    } else if (eventType === "user.deleted") {
+      try {
+        await prisma.user.delete({ where: { clerkId: user.id } });
+      } catch (e) {}
+    }
+
+    return new Response(JSON.stringify({ received: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     });
+  } catch (err) {
+    console.error("Webhook DB error:", err);
+    return new Response("Server error", { status: 500 });
   }
 }
