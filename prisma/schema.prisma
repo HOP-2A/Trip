@@ -70,15 +70,22 @@ model TripMember {
 }
 
 model InvitedMember {
-  id            String @id @default(nanoid())
+  id            String        @id @default(nanoid())
   userId        String
   customTripId  String
   invitedUserId String
+  status        InvitedStatus @default(PENDING)
 
   inviterUser User @relation("InviterRelation", fields: [userId], references: [id])
   invitedUser User @relation("InvitedRelation", fields: [invitedUserId], references: [id])
 
   customTrip CustomTrip @relation(fields: [customTripId], references: [id])
+}
+
+enum InvitedStatus {
+  PENDING
+  REJECTED
+  ACCEPTED
 }
 
 model TripPlan {
