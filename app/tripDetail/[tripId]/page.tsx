@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import * as React from "react";
-import { Info } from "lucide-react";
+import { Info, Send } from "lucide-react";
 
 import { DateRange } from "react-day-picker";
 
@@ -14,16 +14,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronDownIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { NextRequest } from "next/server";
+import { Input } from "@/components/ui/input";
 
 type Trip = {
   id: string;
@@ -98,15 +93,31 @@ const Page = () => {
   const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
+  const [commentInput, setCommentInput] = useState("");
+  const [tripComment, setTripComment] = useState([]);
+
+  const { push } = useRouter();
 
   const params = useParams();
   const { tripId } = params;
+  const { tripPlanId } = params;
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
   const hasJoined = tripMembers.some(
     (member: TripMember) => member.userId === user?.id
   );
+  const tripDetailComment = async () => {
+    const res = await fetch(`api/trip/tripComment/${tripPlanId}`, {
+      method: "POST",
+      body: JSON.stringify({ commentInput, tripPlanId, user }),
+    });
+    const resonse = await res.json();
+    setTripComment(resonse);
+  };
+  const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCommentInput(e.target.value);
+  };
   const joinTrip = async () => {
     if (!trip || !user) return;
 
@@ -168,7 +179,7 @@ const Page = () => {
 
     loadData();
   }, [tripId]);
-
+  console.log(commentInput);
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
       <div className="mb-8">
@@ -266,6 +277,16 @@ const Page = () => {
                     )}
                   </div>
                 )}
+<<<<<<< HEAD
+=======
+              </div>
+<<<<<<< HEAD
+
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">
+                  Сонирхолтой баримтууд
+                </h3>
+>>>>>>> 9dc6264 (arai duusagu)
                 <div className="space-y-6">
                   <Button
                     className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer
@@ -291,6 +312,20 @@ const Page = () => {
                       <img src={""} alt="" />
                     </div>
                   </div>
+=======
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл </h3>
+                <div className="flex gap-3">
+                  <Input
+                    type="text"
+                    placeholder="Энд Бичээрэй"
+                    name="comment"
+                    onChange={(e) => {
+                      handleInputValue(e);
+                    }}
+                  />
+                  <Send onClick={tripDetailComment}>send</Send>
+>>>>>>> f948f8e (arai duusagu)
                 </div>
               </div>
             </>
