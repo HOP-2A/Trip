@@ -3,8 +3,21 @@
 import { ParamValue } from "next/dist/server/request/params";
 import { useEffect, useState } from "react";
 import { days } from "../Custom-Trip/[CustomTripDay]/page";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type FormItem = {
+  title: string;
+  description: string;
+};
+
+type TripDay = {
+  id: string;
+  dayNumber: number;
   title: string;
   description: string;
 };
@@ -28,6 +41,7 @@ export default function DynamicCreateForm({
         description: "",
       }))
     );
+    getDayData();
   }, [duration]);
 
   const handleChange = (
@@ -54,6 +68,16 @@ export default function DynamicCreateForm({
     );
   };
 
+  const [tripDays, setTripDays] = useState<TripDay[]>([]);
+
+  const getDayData = async () => {
+    setIsLoading(true);
+    const res = await fetch(`/api/trip/tripPost/customTripDay/${dayId}`);
+    const data = await res.json();
+    setTripDays(data[0]?.days ?? []);
+    setIsLoading(false);
+  };
+
   const postCustomTripData = async (index: number) => {
     await fetch(`/api/trip/tripPost/customTripDay/${dayId}`, {
       method: "POST",
@@ -65,24 +89,89 @@ export default function DynamicCreateForm({
     });
     window.location.reload();
   };
+  const [isLoading, setIsLoading] = useState(true);
 
   const c = (index: number) => {
     handleCreate(index), postCustomTripData(index);
   };
 
   return (
-    <div className="max-w-xl mx-auto space-y-4">
+    <div className="max-w-xl mx-auto space-y-4 mt-2">
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+          Аяллын хөтөлбөр
+        </h2>
+      </div>
       {durationArray.map((_, index) => {
-        const day = days[index];
+        const dayNumber = index + 1;
+
+        const existingDay = tripDays.find((d) => d.dayNumber === dayNumber);
+
         return (
-          <div key={`form-${index}`} className="border rounded p-4 space-y-2">
-            {day ? (
-              <>
-                <p>{day.title}</p>
-                <p>{day.description}</p>
-              </>
+          <div key={`form-${index}`} className="rounded">
+            {dayNumber || isLoading ? (
+              <div className="space-y-4">
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <AccordionItem value={`day-${dayNumber}`}>
+                    <AccordionTrigger className="px-5 py-4 hover:no-underline font-bold text-lg">
+                      <div className="flex items-center gap-3">
+                        <span className="bg-green-50 text-[#2e5d4d] px-3 py-1 rounded-lg text-sm">
+                          Өдөр {dayNumber}
+                        </span>
+
+                        {existingDay ? (
+                          <span className="text-gray-800 font-semibold">
+                            – {existingDay.title}
+                          </span>
+                        ) : (
+                          <input
+                            className="border px-2 py-1 w-full rounded"
+                            placeholder={`Title ${dayNumber}`}
+                            value={forms[index]?.title ?? ""}
+                            onChange={(e) =>
+                              handleChange(index, "title", e.target.value)
+                            }
+                          />
+                        )}
+                      </div>
+                    </AccordionTrigger>
+
+                    <AccordionContent className="px-5 pb-5 text-gray-600 text-base leading-relaxed border-t border-gray-50 pt-4">
+                      {existingDay ? (
+                        <>
+                          <div className="text-gray-600">
+                            {existingDay.description}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <input
+                            className="border px-2 py-1 w-full rounded"
+                            placeholder={`Description ${dayNumber}`}
+                            value={forms[index]?.description ?? ""}
+                            onChange={(e) =>
+                              handleChange(index, "description", e.target.value)
+                            }
+                          />
+
+                          <button
+                            onClick={() => c(index)}
+                            className="bg-black text-white px-3 py-1 rounded"
+                          >
+                            Create
+                          </button>
+                        </>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
             ) : (
-              <>
+              <div>
                 <h3 className="font-semibold">Day {index + 1}</h3>
                 <input
                   className="border px-2 py-1 w-full rounded"
@@ -104,7 +193,7 @@ export default function DynamicCreateForm({
                 >
                   Create
                 </button>
-              </>
+              </div>
             )}
           </div>
         );
