@@ -11,23 +11,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
-
-import { Input } from "@/components/ui/input";
-
-
-import { ChevronDownIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-=======
 import { NextRequest } from "next/server";
+=======
 import { Input } from "@/components/ui/input";
 
 type Trip = {
@@ -62,7 +49,6 @@ const formatDate = (iso: string) => {
   const year = d.getFullYear();
   return `${month}.${day}.${year}`;
 };
-console.log(formatDate);
 
 const BannerSkeleton = () => (
   <div className="h-[400px] w-full bg-gray-200 rounded-3xl animate-pulse" />
@@ -103,7 +89,6 @@ const Page = () => {
   const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
-  const [commentInput, setCommentInput] = useState("");
   const [tripComment, setTripComment] = useState([]);
   const [tripCommentInput, setTripCommentInput] = useState("");
 
@@ -111,7 +96,7 @@ const Page = () => {
 
   const params = useParams();
   const { tripId } = params;
-  const { tripPlanId } = params;
+
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
@@ -195,7 +180,7 @@ const Page = () => {
 
     loadData();
   }, [tripId]);
-  console.log(commentInput);
+
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
       <div className="mb-8">
@@ -281,16 +266,7 @@ const Page = () => {
           ) : (
             <>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <div className="">
-                  <h3 className="text-xl font-bold text-gray-500 whitespace-nowrap pr-12 pl-10 ">
-                    Захиалгын мэдээлэл
-                  </h3>
-
-                  <hr className=""></hr>
-                </div>
-                <div className="flex flex-col gap-3 pt-3"> </div>
-
-                <div>{}</div>
+                <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
                 <div className="space-y-6">
                   <Button
                     className="w-full py-4 bg-[#2e5d4d] text-white rounded-2xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
@@ -343,6 +319,20 @@ const Page = () => {
                 </div>
               </div>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл</h3>
+                <div className="space-y-6 flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Энд Бичээрэй"
+                    onChange={(e) => {
+                      inputHandlerValue(e);
+                    }}
+                    name="input"
+                  />
+                  <Send onClick={() => tripDetailComment()} />
+                </div>
+              </div>
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">
                   Сонирхолтой баримтууд
                 </h3>
@@ -352,18 +342,6 @@ const Page = () => {
                       <img src={"asd"} alt="" />
                     </div>
                   </div>
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл </h3>
-                <div className="flex gap-3">
-                  <Input
-                    type="text"
-                    placeholder="Энд Бичээрэй"
-                    name="comment"
-                    onChange={(e) => {
-                      handleInputValue(e);
-                    }}
-                  />
-                  <Send onClick={tripDetailComment}>send</Send>
                 </div>
               </div>
             </>
