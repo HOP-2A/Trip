@@ -11,8 +11,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 import { Input } from "@/components/ui/input";
@@ -28,6 +30,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+=======
+import { NextRequest } from "next/server";
+import { Input } from "@/components/ui/input";
+>>>>>>> 9dc6264 (arai duusagu)
 
 >>>>>>> 555b85f (ad)
 type Trip = {
@@ -103,6 +109,7 @@ const Page = () => {
   const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
+  const [commentInput, setCommentInput] = useState("");
   const [tripComment, setTripComment] = useState([]);
   const [tripCommentInput, setTripCommentInput] = useState("");
 
@@ -110,6 +117,7 @@ const Page = () => {
 
   const params = useParams();
   const { tripId } = params;
+  const { tripPlanId } = params;
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
@@ -117,6 +125,7 @@ const Page = () => {
     (member: TripMember) => member.userId === user?.id
   );
   const tripDetailComment = async () => {
+<<<<<<< HEAD
     const res = await fetch(`api/trip/tripComment/${tripId}`, {
       method: "POST",
       body: JSON.stringify({
@@ -127,6 +136,17 @@ const Page = () => {
     });
     const comment = await res.json();
     setTripComment(comment);
+=======
+    const res = await fetch(`api/trip/tripComment/${tripPlanId}`, {
+      method: "POST",
+      body: JSON.stringify({ commentInput, tripPlanId, user }),
+    });
+    const resonse = await res.json();
+    setTripComment(resonse);
+  };
+  const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCommentInput(e.target.value);
+>>>>>>> 9dc6264 (arai duusagu)
   };
   const inputHandlerValue = (e: ChangeEvent<HTMLInputElement>) => {
     setTripCommentInput(e.target.value);
@@ -193,7 +213,7 @@ const Page = () => {
 
     loadData();
   }, [tripId]);
-
+  console.log(commentInput);
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
       <div className="mb-8">
@@ -290,34 +310,7 @@ const Page = () => {
 
                   <hr className=""></hr>
                 </div>
-                <div className="flex flex-col gap-3 pt-3">
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        id="date"
-                        className="w-48 justify-between font-normal"
-                      >
-                        {date ? date.toLocaleDateString() : "Select date"}
-                        <ChevronDownIcon />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto overflow-hidden p-0"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        captionLayout="dropdown"
-                        onSelect={(date) => {
-                          setDate(date);
-                          setOpen(false);
-                        }}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                <div className="flex flex-col gap-3 pt-3"> </div>
 
                 <div>{}</div>
                 <div className="space-y-6">
@@ -343,6 +336,16 @@ const Page = () => {
                     )}
                   </div>
                 )}
+<<<<<<< HEAD
+=======
+              </div>
+<<<<<<< HEAD
+
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">
+                  Сонирхолтой баримтууд
+                </h3>
+>>>>>>> 9dc6264 (arai duusagu)
                 <div className="space-y-6">
                   <Button
                     className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer
@@ -381,6 +384,20 @@ const Page = () => {
                       <img src={"asd"} alt="" />
                     </div>
                   </div>
+=======
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл </h3>
+                <div className="flex gap-3">
+                  <Input
+                    type="text"
+                    placeholder="Энд Бичээрэй"
+                    name="comment"
+                    onChange={(e) => {
+                      handleInputValue(e);
+                    }}
+                  />
+                  <Send onClick={tripDetailComment}>send</Send>
+>>>>>>> f948f8e (arai duusagu)
                 </div>
               </div>
             </>
