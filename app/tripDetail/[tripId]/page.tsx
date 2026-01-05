@@ -1,12 +1,9 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import * as React from "react";
-import { Info, Send } from "lucide-react";
-
-import { DateRange } from "react-day-picker";
-
+import { Calendar, Info } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Send } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -14,10 +11,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
-import { NextRequest } from "next/server";
 import { Input } from "@/components/ui/input";
 
 type Trip = {
@@ -52,7 +47,6 @@ const formatDate = (iso: string) => {
   const year = d.getFullYear();
   return `${month}.${day}.${year}`;
 };
-console.log(formatDate);
 
 const BannerSkeleton = () => (
   <div className="h-[400px] w-full bg-gray-200 rounded-3xl animate-pulse" />
@@ -93,14 +87,14 @@ const Page = () => {
   const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
-  const [commentInput, setCommentInput] = useState("");
   const [tripComment, setTripComment] = useState([]);
+  const [tripCommentInput, setTripCommentInput] = useState("");
 
   const { push } = useRouter();
 
   const params = useParams();
   const { tripId } = params;
-  const { tripPlanId } = params;
+
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
@@ -108,16 +102,21 @@ const Page = () => {
     (member: TripMember) => member.userId === user?.id
   );
   const tripDetailComment = async () => {
-    const res = await fetch(`api/trip/tripComment/${tripPlanId}`, {
+    const res = await fetch(`api/trip/tripComment/${tripId}`, {
       method: "POST",
-      body: JSON.stringify({ commentInput, tripPlanId, user }),
+      body: JSON.stringify({
+        user: clerkId?.id,
+        comment: tripCommentInput,
+        tripId,
+      }),
     });
-    const resonse = await res.json();
-    setTripComment(resonse);
+    const comment = await res.json();
+    setTripComment(comment);
   };
-  const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCommentInput(e.target.value);
+  const inputHandlerValue = (e: ChangeEvent<HTMLInputElement>) => {
+    setTripCommentInput(e.target.value);
   };
+  console.log(tripCommentInput);
   const joinTrip = async () => {
     if (!trip || !user) return;
 
@@ -179,7 +178,7 @@ const Page = () => {
 
     loadData();
   }, [tripId]);
-  console.log(commentInput);
+
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
       <div className="mb-8">
@@ -291,7 +290,20 @@ const Page = () => {
                   </Button>
                 </div>
               </div>
-
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл</h3>
+                <div className="space-y-6 flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Энд Бичээрэй"
+                    onChange={(e) => {
+                      inputHandlerValue(e);
+                    }}
+                    name="input"
+                  />
+                  <Send onClick={() => tripDetailComment()} />
+                </div>
+              </div>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">
                   Сонирхолтой баримтууд
@@ -299,21 +311,9 @@ const Page = () => {
                 <div className="space-y-6">
                   <div className="flex justify-between items-center pb-4 border-b border-gray-50">
                     <div className="flex items-center gap-3">
-                      <img src={""} alt="" />
+                      <img src={"asd"} alt="" />
                     </div>
                   </div>
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл </h3>
-                <div className="flex gap-3">
-                  <Input
-                    type="text"
-                    placeholder="Энд Бичээрэй"
-                    name="comment"
-                    onChange={(e) => {
-                      handleInputValue(e);
-                    }}
-                  />
-                  <Send onClick={tripDetailComment}>send</Send>
                 </div>
               </div>
             </>
