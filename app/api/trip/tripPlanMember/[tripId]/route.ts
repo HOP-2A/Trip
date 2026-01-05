@@ -34,11 +34,11 @@ export const DELETE = async (req: NextRequest) => {
 
 export const GET = async (
   req: NextRequest,
-  context: { params: { tripId: string } }
+  context: { params: Promise<{ tripId: string }> }
 ) => {
   const params = await context.params;
   const { tripId } = params;
-
+w
   const response = await prisma.tripPlanMember.findMany({
     where: { tripPlanId: tripId },
     include: { user: true },

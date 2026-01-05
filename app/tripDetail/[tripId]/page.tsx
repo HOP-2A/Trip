@@ -30,7 +30,7 @@ type TripDay = {
 
 type TripMember = {
   id: string;
-  user: string;
+  userId: string;
   tripPlanId: string;
   role: string;
 };
@@ -250,47 +250,30 @@ const Page = () => {
           ) : (
             <>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
-                <div className="space-y-6">
-                  <Button
-                    className="w-full py-4 bg-[#2e5d4d] text-white rounded-2xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
-                    onClick={joinTrip}
-                  >
-                    Захиалах
-                  </Button>
-                </div>
-              </div>
-
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
                 {tripMembers.length > 0 && (
                   <div className="space-y-4">
                     {tripMembers.map((tM, index) =>
                       tM.user ? (
                         <div key={index}>
-                          <Button
-                            variant="ghost"
-                            onClick={() => push(`/profile/${tM.user?.id}`)}
-                          >
-                            - {tM.user.name}
-                          </Button>
+                          <div>- {tM.user.name}</div>
                         </div>
                       ) : null
                     )}
                   </div>
                 )}
-              </div>
-
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">
-                  Сонирхолтой баримтууд
-                </h3>
                 <div className="space-y-6">
-                  <div className="flex justify-between items-center pb-4 border-b border-gray-50">
-                    <div className="flex items-center gap-3">
-                      <img src={""} alt="" />
-                    </div>
-                  </div>
+                  <Button
+                    className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer
+    ${
+      hasJoined
+        ? "bg-red-500 text-white hover:bg-red-400 cursor-pointer"
+        : "bg-[#2e5d4d] text-white hover:bg-green-700 shadow-blue-200"
+    }`}
+                    onClick={joinTrip}
+                  >
+                    {hasJoined ? "Аяллаас гарах" : "Аялалд бүртгүүлэх"}
+                  </Button>
                 </div>
               </div>
 
