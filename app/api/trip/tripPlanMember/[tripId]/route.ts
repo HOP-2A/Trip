@@ -38,7 +38,6 @@ export const GET = async (
 ) => {
   const params = await context.params;
   const { tripId } = params;
-w
   const response = await prisma.tripPlanMember.findMany({
     where: { tripPlanId: tripId },
     include: { user: true },

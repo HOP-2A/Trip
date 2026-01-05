@@ -1,17 +1,16 @@
-import { prisma } from "@/lib/db";
-import { currentUser } from "@clerk/nextjs/server";
+import { requireAdmin } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function AdminPage() {
-  const user = await currentUser();
-  if (!user) return <div>Not signed in</div>;
-
-  const dbUser = await prisma.user.findUnique({ where: { clerkId: user.id } });
-  if (!dbUser || dbUser.role !== "ADMIN") return <div>Access denied</div>;
+  try {
+    await requireAdmin();
+  } catch {
+    redirect("/");
+  }
 
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
-      <div>test</div>
+    <div className="p-6 space-y-4">
+      <h1 className="text-2xl font-bold">admin panel</h1>
     </div>
   );
 }
