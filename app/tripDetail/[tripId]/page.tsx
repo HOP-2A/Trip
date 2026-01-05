@@ -14,14 +14,10 @@ import { Button } from "@/components/ui/button";
 
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 import { Input } from "@/components/ui/input";
 
-=======
->>>>>>> e0f4f71 (UI)
-=======
+
 import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
@@ -33,9 +29,7 @@ import {
 =======
 import { NextRequest } from "next/server";
 import { Input } from "@/components/ui/input";
->>>>>>> 9dc6264 (arai duusagu)
 
->>>>>>> 555b85f (ad)
 type Trip = {
   id: string;
   title: string;
@@ -125,7 +119,6 @@ const Page = () => {
     (member: TripMember) => member.userId === user?.id
   );
   const tripDetailComment = async () => {
-<<<<<<< HEAD
     const res = await fetch(`api/trip/tripComment/${tripId}`, {
       method: "POST",
       body: JSON.stringify({
@@ -136,17 +129,6 @@ const Page = () => {
     });
     const comment = await res.json();
     setTripComment(comment);
-=======
-    const res = await fetch(`api/trip/tripComment/${tripPlanId}`, {
-      method: "POST",
-      body: JSON.stringify({ commentInput, tripPlanId, user }),
-    });
-    const resonse = await res.json();
-    setTripComment(resonse);
-  };
-  const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCommentInput(e.target.value);
->>>>>>> 9dc6264 (arai duusagu)
   };
   const inputHandlerValue = (e: ChangeEvent<HTMLInputElement>) => {
     setTripCommentInput(e.target.value);
@@ -241,12 +223,8 @@ const Page = () => {
                   {trip.destination} ~ {trip.title}
                 </h1>
                 <div className="flex items-center gap-2 text-gray-500">
-<<<<<<< HEAD
                   <Calendar className="w-5 h-5 text-[#2e5d4d]" />
                   <span>Эхлэл хугацаа: {formatDate(trip.startDate)}</span>
-=======
-                  <span>{formatDate(trip.startDate)}</span>
->>>>>>> 2d26cff (ad)
                 </div>
               </div>
             </div>
@@ -336,16 +314,6 @@ const Page = () => {
                     )}
                   </div>
                 )}
-<<<<<<< HEAD
-=======
-              </div>
-<<<<<<< HEAD
-
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">
-                  Сонирхолтой баримтууд
-                </h3>
->>>>>>> 9dc6264 (arai duusagu)
                 <div className="space-y-6">
                   <Button
                     className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer
@@ -384,7 +352,6 @@ const Page = () => {
                       <img src={"asd"} alt="" />
                     </div>
                   </div>
-=======
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Сэтгэгдэл </h3>
                 <div className="flex gap-3">
@@ -397,7 +364,6 @@ const Page = () => {
                     }}
                   />
                   <Send onClick={tripDetailComment}>send</Send>
->>>>>>> f948f8e (arai duusagu)
                 </div>
               </div>
             </>
