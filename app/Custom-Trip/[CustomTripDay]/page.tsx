@@ -13,6 +13,21 @@ type customTripType = {
   days: days[];
 };
 
+type InviteUserType = {
+  id: string;
+  userId: string;
+  customTripId: string;
+  invitedUserId: string;
+  status: InvitedStatus;
+};
+
+type UserType = {
+  id: string;
+  name: string;
+  email: string;
+  clerkId: string;
+};
+
 export type days = {
   dayNumber: number;
   title: string;
@@ -26,6 +41,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { InvitedStatus } from "@prisma/client";
 
 const Page = () => {
   const params = useParams();
@@ -35,6 +51,8 @@ const Page = () => {
   const [duration, setDuration] = useState<number>(0);
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
+  const [allUser, setAllUser] = useState<UserType[]>([]);
+  const [invitedOne, setInvitedOne] = useState<InviteUserType[]>([]);
 
   const getCustomTripData = async () => {
     const res = await fetch(`/api/trip/tripPost/customTripDay/${DayId}`);
@@ -45,10 +63,6 @@ const Page = () => {
     setDays(days);
     setDuration(response[0].duration);
   };
-
-  useEffect(() => {
-    getCustomTripData();
-  }, []);
 
   const isOwner = getData.length > 0 && getData[0].createdById === user?.id;
 
@@ -61,6 +75,46 @@ const Page = () => {
       }),
     });
   };
+
+  const AllMember = async () => {
+    const response = await fetch("/api/user");
+    const allUser = await response.json();
+    setAllUser(allUser);
+  };
+
+  const InviteMember = async (userId: string) => {
+    await fetch("/api/trip/InviteUser", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: user?.id,
+        customTripId: DayId,
+        invitedUserId: userId,
+        status: "PENDING",
+      }),
+    });
+  };
+
+  const InvitedUser = async () => {
+    const response = await fetch("/api/trip/InviteUser");
+    const invitedOne = await response.json();
+    setInvitedOne(invitedOne);
+  };
+
+  const changeReq = async (inviteId: string, status: string) => {
+    await fetch("/api/trip/InviteUser/ChangeReq", {
+      method: "POST",
+      body: JSON.stringify({
+        status,
+        inviteId,
+      }),
+    });
+  };
+
+  useEffect(() => {
+    getCustomTripData();
+    AllMember();
+    InvitedUser();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
@@ -95,6 +149,45 @@ const Page = () => {
           <Button onClick={CreateGuest}>Create</Button>
         </div>
       )}
+      <div>
+        {invitedOne
+          ? invitedOne.map((invite, index) => {
+              return (
+                <div key={index}>
+                  <div>urigdsan aylal{invite.customTripId}</div>
+                  <div>{invite.status}</div>
+                  <div>{invite.id}</div>
+                  <Button
+                    onClick={() => {
+                      changeReq(invite.id, "ACCEPTED");
+                    }}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      changeReq(invite.id, "REJECTED");
+                    }}
+                  >
+                    Reject
+                  </Button>
+                </div>
+              );
+            })
+          : null}
+
+        <div>
+          {allUser.map((user, index) => {
+            return (
+              <div key={index}>
+                <span>{user.id}</span>
+                <p>{user.name.toUpperCase()}</p>
+                <Button onClick={() => InviteMember(user.id)}>Invite</Button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
