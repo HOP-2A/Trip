@@ -18,6 +18,7 @@ type InviteUserType = {
   userId: string;
   customTripId: string;
   invitedUserId: string;
+  status: InvitedStatus;
 };
 
 type UserType = {
@@ -40,6 +41,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { InvitedStatus } from "@prisma/client";
 
 const Page = () => {
   const params = useParams();
@@ -50,6 +52,7 @@ const Page = () => {
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
   const [allUser, setAllUser] = useState<UserType[]>([]);
+  const [invitedOne, setInvitedOne] = useState<InviteUserType[]>([]);
 
   const getCustomTripData = async () => {
     const res = await fetch(`/api/trip/tripPost/customTripDay/${DayId}`);
@@ -78,7 +81,6 @@ const Page = () => {
     const allUser = await response.json();
     setAllUser(allUser);
   };
-  console.log(allUser);
 
   const InviteMember = async (userId: string) => {
     await fetch("/api/trip/InviteUser", {
@@ -87,6 +89,23 @@ const Page = () => {
         userId: user?.id,
         customTripId: DayId,
         invitedUserId: userId,
+        status: "PENDING",
+      }),
+    });
+  };
+
+  const InvitedUser = async () => {
+    const response = await fetch("/api/trip/InviteUser");
+    const invitedOne = await response.json();
+    setInvitedOne(invitedOne);
+  };
+
+  const changeReq = async (inviteId: string, status: string) => {
+    await fetch("/api/trip/InviteUser/ChangeReq", {
+      method: "POST",
+      body: JSON.stringify({
+        status,
+        inviteId,
       }),
     });
   };
@@ -94,6 +113,7 @@ const Page = () => {
   useEffect(() => {
     getCustomTripData();
     AllMember();
+    InvitedUser();
   }, []);
 
   return (
@@ -130,15 +150,43 @@ const Page = () => {
         </div>
       )}
       <div>
-        {allUser.map((user, index) => {
-          return (
-            <div key={index}>
-              <span>{user.id}</span>
-              <p>{user.name.toUpperCase()}</p>
-              <Button onClick={() => InviteMember(user.id)}>Invite</Button>
-            </div>
-          );
-        })}
+        {invitedOne
+          ? invitedOne.map((invite, index) => {
+              return (
+                <div key={index}>
+                  <div>urigdsan aylal{invite.customTripId}</div>
+                  <div>{invite.status}</div>
+                  <div>{invite.id}</div>
+                  <Button
+                    onClick={() => {
+                      changeReq(invite.id, "ACCEPTED");
+                    }}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      changeReq(invite.id, "REJECTED");
+                    }}
+                  >
+                    Reject
+                  </Button>
+                </div>
+              );
+            })
+          : null}
+
+        <div>
+          {allUser.map((user, index) => {
+            return (
+              <div key={index}>
+                <span>{user.id}</span>
+                <p>{user.name.toUpperCase()}</p>
+                <Button onClick={() => InviteMember(user.id)}>Invite</Button>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
