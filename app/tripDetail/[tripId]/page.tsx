@@ -30,6 +30,9 @@ type TripDay = {
 
 type TripMember = {
   id: string;
+  user: {
+    name: string;
+  };
   userId: string;
   tripPlanId: string;
   role: string;
@@ -82,9 +85,6 @@ const Page = () => {
   const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
-  const [tripComment, setTripComment] = useState([]);
-
-  const { push } = useRouter();
 
   const params = useParams();
   const { tripId } = params;
@@ -95,14 +95,6 @@ const Page = () => {
   const hasJoined = tripMembers.some(
     (member: TripMember) => member.userId === user?.id
   );
-  const tripDetailComment = async () => {
-    const res = await fetch(`api/trip/tripComment`, {
-      method: "POST",
-      body: JSON.stringify({ userId: user?.id }),
-    });
-    const comment = await res.json();
-    setTripComment(res);
-  };
   const joinTrip = async () => {
     if (!trip || !user) return;
 
