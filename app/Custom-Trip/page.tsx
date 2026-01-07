@@ -40,6 +40,7 @@ const CustomTrip = () => {
     const data = await response.json();
     setBringData(data);
   };
+
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
   };
@@ -63,6 +64,12 @@ const CustomTrip = () => {
         destination: input,
         images: imageUrl,
         createdById: user?.id,
+        members: {
+          create: {
+            userId: user?.id,
+            role: "OWNER",
+          },
+        },
       }),
     });
     await BringCustomTrip();
@@ -108,10 +115,6 @@ const CustomTrip = () => {
             </div>
           </div>
         </div>
-        {/* <div className="text-center text-2xl font-semibold text-gray-800">
-          Бид төлөвлөе, та аялал — таны мөрөөдлийн аяллыг бид үнэ төлбөргүй
-          төлөвлөж өгье!
-        </div> */}
         <div className="flex justify-center mt-5 gap-5">
           <div className="border p-5 rounded-2xl">
             <GenerateImage imageUrl={imageUrl} setImageUrl={setImageUrl} />

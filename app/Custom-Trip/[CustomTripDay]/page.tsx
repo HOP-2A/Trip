@@ -153,10 +153,10 @@ const Page = () => {
     }
   };
 
-  const deleteMember = async () => {
+  const deleteMember = async (mId: string) => {
     await fetch(`/api/trip/tripMember`, {
       method: "DELETE",
-      body: JSON.stringify({ userId: user?.id }),
+      body: JSON.stringify({ userId: mId }),
     });
     if (!user) {
       return toast.success("Amjilttai ustgagdlaa!");
@@ -266,9 +266,15 @@ const Page = () => {
                     {isOwner && (
                       <Trash
                         onClick={() => {
-                          deleteMember();
+                          deleteMember(m.id);
                         }}
                       />
+                    )}
+                    {m.id === user?.id && (
+                      <Trash
+                        onClick={() => deleteMember(m.id)}
+                        className="text-xs text-gray-400 hover:text-red-500 transition cursor-pointer"
+                      ></Trash>
                     )}
                   </div>
                 ))}
@@ -317,7 +323,7 @@ const Page = () => {
 
                         <Trash
                           onClick={() => {
-                            deleteMember();
+                            deleteMember(user.id);
                           }}
                         />
                       </div>
