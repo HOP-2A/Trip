@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
 import { NextRequest } from "next/server";
-=======
 import { Input } from "@/components/ui/input";
 
 type Trip = {
@@ -100,7 +99,7 @@ const Page = () => {
   const [totalPerson, setTotalPerson] = useState(0);
   const [tripComment, setTripComment] = useState<TripComment[]>([]);
   const [tripCommentInput, setTripCommentInput] = useState("");
-  console.log(tripComment);
+
   const params = useParams();
   const { tripId } = params;
 
@@ -344,7 +343,7 @@ const Page = () => {
                         className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 shadow-sm flex justify-between items-start"
                       >
                         <div>
-                          <div>{c.user.name}</div>
+                          {/* <div>{c.user.name}</div> */}
                           <p className="text-gray-700 leading-relaxed">
                             {c.comment}
                           </p>
