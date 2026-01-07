@@ -54,7 +54,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { InvitedStatus } from "@prisma/client";
 import { toast } from "sonner";
-import { Calendar, Delete, DeleteIcon, Trash, User } from "lucide-react";
+import { Calendar, Trash, User } from "lucide-react";
 
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
@@ -226,6 +226,7 @@ const Page = () => {
             {getData.map((data, index) => (
               <div key={index} className="space-y-2">
                 <div className="relative h-[400px] w-full overflow-hidden rounded-3xl shadow-lg">
+                  {/* <CarouselOrientation data={data.images} /> */}
                   <img
                     src={data.images[0]}
                     alt="trip banner"
