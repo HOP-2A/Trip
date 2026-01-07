@@ -95,7 +95,6 @@ const Page = () => {
   const [tripsDayByDay, setTripsDayByDay] = useState<TripDay[]>([]);
   const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [totalPerson, setTotalPerson] = useState(0);
   const [tripComment, setTripComment] = useState<TripComment[]>([]);
   const [tripCommentInput, setTripCommentInput] = useState("");
 
@@ -166,6 +165,7 @@ const Page = () => {
       setTripMembers((prev) => [...prev, newMember]);
     }
   };
+
   useEffect(() => {
     if (!tripId) return;
 
@@ -295,7 +295,7 @@ const Page = () => {
             <>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
-                {tripMembers.length > 0 && (
+                {tripMembers.length > 0 ? (
                   <div className="space-y-4">
                     {tripMembers.map((tM, index) =>
                       tM.user ? (
@@ -305,7 +305,12 @@ const Page = () => {
                       ) : null
                     )}
                   </div>
+                ) : (
+                  <div>
+                    <div>no users yet</div>
+                  </div>
                 )}
+
                 <div className="space-y-6">
                   <Button
                     className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer

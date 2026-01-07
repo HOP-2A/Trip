@@ -58,15 +58,21 @@ model CustomTrip {
 }
 
 model TripMember {
-  id           String @id @default(nanoid())
+  id           String   @id @default(nanoid())
   userId       String
   customTripId String
-  role         String @default("member")
+  role         TripRole @default(MEMBER)
 
   user       User       @relation(fields: [userId], references: [id])
   customTrip CustomTrip @relation(fields: [customTripId], references: [id])
 
   @@unique([userId, customTripId])
+}
+
+enum TripRole {
+  OWNER
+  ADMIN
+  MEMBER
 }
 
 model InvitedMember {
@@ -105,10 +111,10 @@ model TripPlan {
 }
 
 model TripPlanMember {
-  id         String @id @default(nanoid())
+  id         String   @id @default(nanoid())
   userId     String
   tripPlanId String
-  role       String @default("member")
+  role       TripRole @default(MEMBER)
 
   user     User     @relation(fields: [userId], references: [id])
   tripPlan TripPlan @relation(fields: [tripPlanId], references: [id])

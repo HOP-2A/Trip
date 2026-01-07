@@ -42,7 +42,7 @@ export const GenerateImage = ({
     }
   };
   return (
-    <div>
+    <div className="flex">
       <Input
         placeholder="Your generated AI image "
         name="input"
@@ -57,8 +57,10 @@ export const GenerateImage = ({
         onClick={() => {
           generateImage();
         }}
+        variant="outline"
+        className="cursor-pointer"
       >
-        Create img
+        Generate
       </Button>
     </div>
   );

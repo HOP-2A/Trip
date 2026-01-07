@@ -81,7 +81,7 @@ const CustomTrip = () => {
 
   return (
     <div>
-      <div className="min-h-screen bg-gray-100 relative">
+      <div className="min-h-screen relative">
         <div className="absolute top-0 w-full">
           <Header />
         </div>
@@ -108,36 +108,57 @@ const CustomTrip = () => {
             </div>
           </div>
         </div>
-        <div className="text-center text-2xl font-semibold text-gray-800">
+        {/* <div className="text-center text-2xl font-semibold text-gray-800">
           Бид төлөвлөе, та аялал — таны мөрөөдлийн аяллыг бид үнэ төлбөргүй
           төлөвлөж өгье!
-        </div>
-        <div className="flex justify-evenly gap-2 pl-2">
-          <GenerateImage imageUrl={imageUrl} setImageUrl={setImageUrl} />
-          <div>
-            <Input
-              placeholder="Your destination..."
-              value={input}
-              onChange={(e) => {
-                handleInput(e);
-              }}
-            />
+        </div> */}
+        <div className="flex justify-center mt-5 gap-5">
+          <div className="border p-5 rounded-2xl">
+            <GenerateImage imageUrl={imageUrl} setImageUrl={setImageUrl} />
+            <div>
+              {imageUrl.length ? (
+                <div className="bg-gray-50 p-5 rounded-lg flex justify-around h-50">
+                  {imageUrl.map((url) => (
+                    <img
+                      key={url}
+                      className="w-[150px] rounded-2xl"
+                      src={url}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-gray-50 p-5 rounded-lg flex gap-2 h-50 justify-center items-center">
+                  Your Generated Image Here!
+                </div>
+              )}
+            </div>
           </div>
-          <Calendar05 onChange={setDuration} />
-          <Pop totalPerson={totalPerson} setTotalPerson={setTotalPerson} />
-          <Button
-            onClick={() => {
-              CustomTripCreate();
-              setImageUrl([]);
-            }}
-          >
-            Create
-          </Button>
+          <div className="flex border rounded-2xl gap-5 p-5 items-center">
+            <div>
+              <Input
+                placeholder="Where you wanna go..."
+                value={input}
+                onChange={(e) => {
+                  handleInput(e);
+                }}
+              />
+            </div>
+            <Calendar05 onChange={setDuration} />
+            <Pop totalPerson={totalPerson} setTotalPerson={setTotalPerson} />
+            <Button
+              onClick={() => {
+                CustomTripCreate();
+                setImageUrl([]);
+              }}
+              variant="outline"
+            >
+              Create
+            </Button>
+            <div>
+              <DialogDemo />
+            </div>
+          </div>
         </div>
-        <div className="pl-5 m-2">
-          <DialogDemo />
-        </div>
-
         <div className="w-full max-w-7xl mx-auto mt-10 px-4">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {bringData.map((bring) => {
@@ -169,19 +190,6 @@ const CustomTrip = () => {
           </div>
         </div>
       </div>
-      {imageUrl ? (
-        <div className="bg-gray-50 p-4 rounded-lg">
-          {imageUrl.map((url) => (
-            <img
-              key={url}
-              className="w-full h-auto rounded-lg shadow-md "
-              src={url}
-            />
-          ))}
-        </div>
-      ) : (
-        ""
-      )}
     </div>
   );
 };

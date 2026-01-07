@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { InvitedStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (req: NextRequest, res: NextResponse) => {
+export const GET = async () => {
   const invitedUser = await prisma.invitedMember.findMany({});
   return NextResponse.json(invitedUser);
 };
@@ -29,4 +29,3 @@ export const POST = async (req: NextRequest) => {
   });
   return NextResponse.json(InviteMember);
 };
-

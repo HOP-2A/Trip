@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
+import { CalendarDays } from "lucide-react";
 
 export function Calendar05({
   onChange,
@@ -24,7 +25,7 @@ export function Calendar05({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline">Choose date</Button>
+        <CalendarDays></CalendarDays>
       </PopoverTrigger>
       <PopoverContent className="w-130">
         <Calendar

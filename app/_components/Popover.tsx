@@ -5,6 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { User } from "lucide-react";
 
 export const Pop = ({
   totalPerson,
@@ -24,7 +25,9 @@ export const Pop = ({
   return (
     <div>
       <Popover>
-        <PopoverTrigger>how many person?</PopoverTrigger>
+        <PopoverTrigger>
+          <User></User>
+        </PopoverTrigger>
         <PopoverContent>
           <div>
             Том хүн (12+) нас
