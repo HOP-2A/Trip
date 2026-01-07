@@ -42,6 +42,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { InvitedStatus } from "@prisma/client";
+import { toast } from "sonner";
 
 const Page = () => {
   const params = useParams();
@@ -82,6 +83,8 @@ const Page = () => {
     setAllUser(allUser);
   };
 
+  const members = allUser.filter((member) => member.id !== user?.id);
+
   const InviteMember = async (userId: string) => {
     await fetch("/api/trip/InviteUser", {
       method: "POST",
@@ -108,6 +111,12 @@ const Page = () => {
         inviteId,
       }),
     });
+    if (status === "REJECTED") {
+      return <div className="hidden"></div>;
+    }
+    if (status === "ACCEPTED") {
+      return toast.success("Amjilltai aylald urigdlaa!!");
+    }
   };
 
   useEffect(() => {
@@ -138,11 +147,8 @@ const Page = () => {
       </div>
       <DynamicCreateForm days={days} duration={duration} dayId={DayId} />
 
-      {isOwner ? (
-        <div>
-          chi creator bizde
-          <Button>aylald hun urih</Button>
-        </div>
+      {/* {isOwner ? (
+        ""
       ) : (
         <div>
           Aylald negdeh
@@ -154,7 +160,6 @@ const Page = () => {
           ? invitedOne.map((invite, index) => {
               return (
                 <div key={index}>
-                  <div>urigdsan aylal{invite.customTripId}</div>
                   <div>{invite.status}</div>
                   <div>{invite.id}</div>
                   <Button
@@ -174,20 +179,19 @@ const Page = () => {
                 </div>
               );
             })
-          : null}
-
-        <div>
-          {allUser.map((user, index) => {
+          : null} */}
+      {/* <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+          <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
+          {members.map((user, index) => {
             return (
-              <div key={index}>
-                <span>{user.id}</span>
+              <div key={index} className="flex">
                 <p>{user.name.toUpperCase()}</p>
                 <Button onClick={() => InviteMember(user.id)}>Invite</Button>
               </div>
             );
           })}
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
     </div>
   );
 };
