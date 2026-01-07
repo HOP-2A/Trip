@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/db";
-import { useUser } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (
@@ -8,9 +7,9 @@ export const POST = async (
 ) => {
   const { tripPlanId } = await context.params;
   const body = await req.json();
-  const { comment } = body;
+  const { comment, userId } = body;
   const createdComment = await prisma.tripComment.create({
-    data: { comment, tripPlanId },
+    data: { comment, userId, tripPlanId },
   });
   return NextResponse.json(createdComment);
 };
@@ -21,7 +20,17 @@ export const GET = async (
 ) => {
   const { tripPlanId } = await context.params;
   const response = await prisma.tripComment.findMany({
-    where: { tripPlanId: tripPlanId },
+    where: { tripPlanId },
+    include: {
+      user: true,
+    },
   });
   return NextResponse.json(response);
+};
+export const DELETE = async (req: NextRequest) => {
+  const { commentId } = await req.json();
+  const deletedComment = await prisma.tripComment.delete({
+    where: { id: commentId },
+  });
+  return NextResponse.json(deletedComment);
 };
