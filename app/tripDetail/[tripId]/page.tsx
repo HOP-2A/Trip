@@ -29,6 +29,7 @@ type TripDay = {
 };
 
 type TripMember = {
+  user: any;
   id: string;
   userId: string;
   tripPlanId: string;
@@ -101,7 +102,7 @@ const Page = () => {
       body: JSON.stringify({ userId: user?.id }),
     });
     const comment = await res.json();
-    setTripComment(res);
+    setTripComment(comment);
   };
   const joinTrip = async () => {
     if (!trip || !user) return;
