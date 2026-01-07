@@ -147,7 +147,7 @@ const Page = () => {
       </div>
       <DynamicCreateForm days={days} duration={duration} dayId={DayId} />
 
-      {/* {isOwner ? (
+      {isOwner ? (
         ""
       ) : (
         <div>
@@ -156,42 +156,46 @@ const Page = () => {
         </div>
       )}
       <div>
-        {invitedOne
-          ? invitedOne.map((invite, index) => {
-              return (
-                <div key={index}>
-                  <div>{invite.status}</div>
-                  <div>{invite.id}</div>
-                  <Button
-                    onClick={() => {
-                      changeReq(invite.id, "ACCEPTED");
-                    }}
-                  >
-                    Accept
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      changeReq(invite.id, "REJECTED");
-                    }}
-                  >
-                    Reject
-                  </Button>
-                </div>
-              );
-            })
-          : null} */}
-      {/* <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+        <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
           <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
           {members.map((user, index) => {
             return (
               <div key={index} className="flex">
                 <p>{user.name.toUpperCase()}</p>
-                <Button onClick={() => InviteMember(user.id)}>Invite</Button>
+                <Button variant="ghost" onClick={() => InviteMember(user.id)}>
+                  Invite
+                </Button>
               </div>
             );
           })}
-        </div> */}
-      {/* </div> */}
+
+          {invitedOne
+            ? invitedOne.map((invite, index) => {
+                return (
+                  <div key={index} className="flex">
+                    <div>{invite.status.toLocaleLowerCase()}</div>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        changeReq(invite.id, "ACCEPTED");
+                      }}
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        changeReq(invite.id, "REJECTED");
+                      }}
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                );
+              })
+            : null}
+        </div>
+      </div>
     </div>
   );
 };
