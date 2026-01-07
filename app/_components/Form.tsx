@@ -9,6 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Info } from "lucide-react";
 
 type FormItem = {
   title: string;
@@ -33,7 +34,16 @@ export default function DynamicCreateForm({
 }) {
   const durationArray = Array.from({ length: duration }, (_, i) => i + 1);
   const [forms, setForms] = useState<FormItem[]>([]);
+  const [tripDays, setTripDays] = useState<TripDay[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  const getDayData = async () => {
+    setIsLoading(true);
+    const res = await fetch(`/api/trip/tripPost/customTripDay/${dayId}`);
+    const data = await res.json();
+    setTripDays(data[0]?.days ?? []);
+    setIsLoading(false);
+  };
   useEffect(() => {
     setForms(
       Array.from({ length: duration }, () => ({
@@ -68,16 +78,6 @@ export default function DynamicCreateForm({
     );
   };
 
-  const [tripDays, setTripDays] = useState<TripDay[]>([]);
-
-  const getDayData = async () => {
-    setIsLoading(true);
-    const res = await fetch(`/api/trip/tripPost/customTripDay/${dayId}`);
-    const data = await res.json();
-    setTripDays(data[0]?.days ?? []);
-    setIsLoading(false);
-  };
-
   const postCustomTripData = async (index: number) => {
     await fetch(`/api/trip/tripPost/customTripDay/${dayId}`, {
       method: "POST",
@@ -89,28 +89,25 @@ export default function DynamicCreateForm({
     });
     window.location.reload();
   };
-  const [isLoading, setIsLoading] = useState(true);
 
   const c = (index: number) => {
     handleCreate(index), postCustomTripData(index);
   };
 
   return (
-    <div className="max-w-xl mx-auto space-y-4 mt-2">
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          Аяллын хөтөлбөр
-        </h2>
-      </div>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+        <Info className="w-6 h-6 text-[#2e5d4d]" /> Аяллын хөтөлбөр
+      </h2>
       {durationArray.map((_, index) => {
         const dayNumber = index + 1;
 
         const existingDay = tripDays.find((d) => d.dayNumber === dayNumber);
 
         return (
-          <div key={`form-${index}`} className="rounded">
+          <div key={`form-${index}`}>
             {dayNumber || isLoading ? (
-              <div className="space-y-4">
+              <div>
                 <Accordion
                   type="single"
                   collapsible

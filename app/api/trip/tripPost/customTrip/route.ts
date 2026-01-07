@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { TripRole } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
@@ -14,7 +15,7 @@ export const POST = async (req: NextRequest) => {
   } = body;
 
   const dbUser = await prisma.user.findUnique({
-    where: { clerkId: createdById },
+    where: { id: createdById },
   });
 
   if (!dbUser) {
@@ -30,11 +31,17 @@ export const POST = async (req: NextRequest) => {
       destination,
       images,
       createdById: dbUser.id,
+      members: {
+        create: {
+          userId: createdById,
+          role: TripRole.OWNER,
+        },
+      },
     },
   });
   return NextResponse.json(newTrip);
 };
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   const response = await prisma.customTrip.findMany({});
   return NextResponse.json(response);
 };

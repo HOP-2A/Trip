@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { TripRole } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
@@ -12,7 +13,7 @@ export const POST = async (req: NextRequest) => {
   if (existing) return NextResponse.json(existing);
 
   const newTripMember = await prisma.tripPlanMember.create({
-    data: { userId, tripPlanId, role: "member" },
+    data: { userId, tripPlanId, role: TripRole.MEMBER },
     include: { user: true },
   });
 
