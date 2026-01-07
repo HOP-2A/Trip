@@ -31,7 +31,6 @@ type TripDay = {
 };
 
 type TripMember = {
-  user: any;
   id: string;
   user: {
     name: string;
