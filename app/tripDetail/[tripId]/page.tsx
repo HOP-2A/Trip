@@ -2,7 +2,8 @@
 
 import { Calendar, Info } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Send } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -12,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
+import { NextRequest } from "next/server";
+import { Input } from "@/components/ui/input";
 
 type Trip = {
   id: string;
@@ -31,9 +34,21 @@ type TripDay = {
 type TripMember = {
   user: any;
   id: string;
+  user: {
+    name: string;
+  };
   userId: string;
   tripPlanId: string;
   role: string;
+};
+
+type TripComment = {
+  id: string;
+  comment: string;
+  user: {
+    id: string;
+    name: string;
+  };
 };
 
 const formatDate = (iso: string) => {
@@ -83,9 +98,8 @@ const Page = () => {
   const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPerson, setTotalPerson] = useState(0);
-  const [tripComment, setTripComment] = useState([]);
-
-  const { push } = useRouter();
+  const [tripComment, setTripComment] = useState<TripComment[]>([]);
+  const [tripCommentInput, setTripCommentInput] = useState("");
 
   const params = useParams();
   const { tripId } = params;
@@ -96,14 +110,41 @@ const Page = () => {
   const hasJoined = tripMembers.some(
     (member: TripMember) => member.userId === user?.id
   );
+
   const tripDetailComment = async () => {
-    const res = await fetch(`api/trip/tripComment`, {
+    if (!tripCommentInput.trim()) return;
+
+    await fetch(`/api/trip/tripComment/${tripId}`, {
       method: "POST",
-      body: JSON.stringify({ userId: user?.id }),
+      body: JSON.stringify({
+        userId: user?.id,
+        comment: tripCommentInput,
+        tripPlanId: trip?.id,
+      }),
     });
-    const comment = await res.json();
-    setTripComment(comment);
+
+    setTripCommentInput("");
+    tripCommentGet();
   };
+
+  const tripCommentGet = async () => {
+    const res = await fetch(`/api/trip/tripComment/${tripId}`);
+    const comments = await res.json();
+    setTripComment(comments);
+  };
+  const tripCommentDelete = async (commentId: string) => {
+    await fetch(`/api/trip/tripComment/${tripId}`, {
+      method: "DELETE",
+      body: JSON.stringify({ commentId }),
+    });
+
+    setTripComment((prev) => prev.filter((c) => c.id !== commentId));
+  };
+
+  const inputHandlerValue = (e: ChangeEvent<HTMLInputElement>) => {
+    setTripCommentInput(e.target.value);
+  };
+
   const joinTrip = async () => {
     if (!trip || !user) return;
 
@@ -165,6 +206,10 @@ const Page = () => {
 
     loadData();
   }, [tripId]);
+
+  useEffect(() => {
+    tripCommentGet();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
@@ -251,6 +296,18 @@ const Page = () => {
           ) : (
             <>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
+                <div className="space-y-6">
+                  <Button
+                    className="w-full py-4 bg-[#2e5d4d] text-white rounded-2xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
+                    onClick={joinTrip}
+                  >
+                    Захиалах
+                  </Button>
+                </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
                 {tripMembers.length > 0 && (
                   <div className="space-y-4">
@@ -277,7 +334,61 @@ const Page = () => {
                   </Button>
                 </div>
               </div>
-
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл</h3>
+                <div>
+                  <div className="space-y-4">
+                    {tripComment.map((c) => (
+                      <div
+                        key={c.id}
+                        className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 shadow-sm flex justify-between items-start"
+                      >
+                        <div>
+                          {/* <div>{c.user.name}</div> */}
+                          <p className="text-gray-700 leading-relaxed">
+                            {c.comment}
+                          </p>
+                          <button
+                            onClick={() => tripCommentDelete(c.id)}
+                            className="text-xs text-gray-400 hover:text-red-500 transition cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 mt-6">
+                  <div className="relative flex-1">
+                    <Input
+                      type="text"
+                      value={tripCommentInput}
+                      onChange={inputHandlerValue}
+                      placeholder="Сэтгэгдлээ бичнэ үү..."
+                      className="rounded-full pl-5 pr-12 py-6 shadow-sm focus-visible:ring-[#2e5d4d]"
+                    />
+                    <Send
+                      onClick={tripDetailComment}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#2e5d4d] cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
+                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл</h3>
+                <div className="space-y-6 flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Энд Бичээрэй"
+                    onChange={(e) => {
+                      inputHandlerValue(e);
+                    }}
+                    name="input"
+                  />
+                  <Send onClick={() => tripDetailComment()} />
+                </div>
+              </div>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">
                   Сонирхолтой баримтууд
@@ -285,7 +396,7 @@ const Page = () => {
                 <div className="space-y-6">
                   <div className="flex justify-between items-center pb-4 border-b border-gray-50">
                     <div className="flex items-center gap-3">
-                      <img src={""} alt="" />
+                      <img src={"asd"} alt="" />
                     </div>
                   </div>
                 </div>
