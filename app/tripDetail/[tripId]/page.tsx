@@ -1,7 +1,7 @@
 "use client";
 
-import { Calendar, Info } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { Calendar, Info, Trash } from "lucide-react";
+import { useParams } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Send } from "lucide-react";
 import {
@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@/hooks/use-auth";
-import { NextRequest } from "next/server";
 import { Input } from "@/components/ui/input";
 
 type Trip = {
@@ -295,18 +294,6 @@ const Page = () => {
           ) : (
             <>
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">Захиалгын мэдээлэл</h3>
-                <div className="space-y-6">
-                  <Button
-                    className="w-full py-4 bg-[#2e5d4d] text-white rounded-2xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-blue-200 cursor-pointer"
-                    onClick={joinTrip}
-                  >
-                    Захиалах
-                  </Button>
-                </div>
-              </div>
-
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Аяллын Гишүүд</h3>
                 {tripMembers.length > 0 && (
                   <div className="space-y-4">
@@ -342,17 +329,22 @@ const Page = () => {
                         key={c.id}
                         className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 shadow-sm flex justify-between items-start"
                       >
-                        <div>
-                          {/* <div>{c.user.name}</div> */}
-                          <p className="text-gray-700 leading-relaxed">
-                            {c.comment}
-                          </p>
-                          <button
-                            onClick={() => tripCommentDelete(c.id)}
-                            className="text-xs text-gray-400 hover:text-red-500 transition cursor-pointer"
-                          >
-                            Delete
-                          </button>
+                        <div className="space-y-1">
+                          <div className="text-sm font-semibold text-gray-800">
+                            {c.user.name}
+                          </div>
+                          <div className="flex">
+                            <p className="text-gray-700 leading-relaxed">
+                              {c.comment}
+                            </p>
+
+                            {c.user.id === user?.id && (
+                              <Trash
+                                onClick={() => tripCommentDelete(c.id)}
+                                className="text-xs text-gray-400 hover:text-red-500 transition cursor-pointer"
+                              ></Trash>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -371,32 +363,6 @@ const Page = () => {
                       onClick={tripDetailComment}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#2e5d4d] cursor-pointer"
                     />
-                  </div>
-                </div>
-              </div>
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">Сэтгэгдэл</h3>
-                <div className="space-y-6 flex gap-2">
-                  <Input
-                    type="text"
-                    placeholder="Энд Бичээрэй"
-                    onChange={(e) => {
-                      inputHandlerValue(e);
-                    }}
-                    name="input"
-                  />
-                  <Send onClick={() => tripDetailComment()} />
-                </div>
-              </div>
-              <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
-                <h3 className="text-xl font-bold mb-6">
-                  Сонирхолтой баримтууд
-                </h3>
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center pb-4 border-b border-gray-50">
-                    <div className="flex items-center gap-3">
-                      <img src={"asd"} alt="" />
-                    </div>
                   </div>
                 </div>
               </div>
