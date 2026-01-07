@@ -5,9 +5,9 @@ export async function GET(
   req: Request,
   context: { params: Promise<{ clerkId: string }> }
 ) {
-  const { clerkId } = await context.params;
-
   try {
+    const { clerkId } = await context.params;
+
     const user = await prisma.user.findUnique({
       where: { clerkId },
     });
@@ -18,6 +18,7 @@ export async function GET(
 
     return NextResponse.json(user);
   } catch (err) {
+    console.error(err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
