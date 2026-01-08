@@ -1,5 +1,14 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
+
+import DynamicCreateForm from "@/app/_components/Form";
+import { useUser } from "@clerk/nextjs";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { InvitedStatus } from "@prisma/client";
+import { toast } from "sonner";
+import { Calendar, Trash, User, Loader2 } from "lucide-react";
 
 type customTripType = {
   destination: string;
@@ -46,40 +55,30 @@ type tripMember = {
   };
 };
 
-import DynamicCreateForm from "@/app/_components/Form";
-import { useUser } from "@clerk/nextjs";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import { InvitedStatus } from "@prisma/client";
-import { toast } from "sonner";
-import { Calendar, Delete, DeleteIcon, Trash, User } from "lucide-react";
-
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
 );
 
 const TripHeaderSkeleton = () => (
-  <div className="mb-8 space-y-4">
-    <Skeleton className="h-[400px] w-full rounded-3xl" />
-    <Skeleton className="h-8 w-64" />
-    <Skeleton className="h-4 w-48" />
-    <Skeleton className="h-4 w-40" />
+  <div className="mb-6 sm:mb-8 space-y-4">
+    <Skeleton className="h-[250px] sm:h-[350px] md:h-[400px] w-full rounded-2xl sm:rounded-3xl" />
+    <Skeleton className="h-6 sm:h-8 w-48 sm:w-64" />
+    <Skeleton className="h-4 w-36 sm:w-48" />
+    <Skeleton className="h-4 w-32 sm:w-40" />
   </div>
 );
 
 const DaysFormSkeleton = () => (
   <div className="space-y-4">
     {Array.from({ length: 4 }).map((_, i) => (
-      <Skeleton key={i} className="h-16 w-[520px]" />
+      <Skeleton key={i} className="h-16 w-full sm:w-[520px]" />
     ))}
   </div>
 );
 
 const MembersSkeleton = () => (
-  <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white space-y-4 w-[360px]">
-    <Skeleton className="h-6 w-40" />
+  <div className="border border-gray-200 rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl bg-white space-y-4 w-full sm:w-[360px]">
+    <Skeleton className="h-6 w-32 sm:w-40" />
     {Array.from({ length: 5 }).map((_, i) => (
       <Skeleton key={i} className="h-10 w-full" />
     ))}
@@ -88,264 +87,498 @@ const MembersSkeleton = () => (
 
 const Page = () => {
   const params = useParams();
-  const DayId = params.CustomTripDay;
+  const DayId = params.CustomTripDay as string;
 
-  const [getData, setGetData] = useState<customTripType[]>([]);
+  const [tripData, setTripData] = useState<customTripType | null>(null);
   const [days, setDays] = useState<days[]>([]);
-  const [duration, setDuration] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isJoining, setIsJoining] = useState(false);
+  const [isInviting, setIsInviting] = useState<string | null>(null);
 
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
 
   const [allUser, setAllUser] = useState<UserType[]>([]);
   const [tripMembers, setTripMembers] = useState<tripMember[]>([]);
-  const [invitedOne, setInvitedOne] = useState<InviteUserType[]>([]);
+  const [invitedUsers, setInvitedUsers] = useState<InviteUserType[]>([]);
 
   const hasJoined = tripMembers.some(
     (member: tripMember) => member.userId === user?.id
   );
 
+  const isOwner = tripData?.createdById === user?.id;
+
+  const myPendingInvites = invitedUsers.filter(
+    (invite) =>
+      invite.invitedUserId === user?.id &&
+      invite.status === "PENDING" &&
+      invite.customTripId === DayId
+  );
+
   const getCustomTripData = async () => {
+    if (!DayId) return;
+
     try {
-      setIsLoading(true);
       const res = await fetch(`/api/trip/tripPost/customTripDay/${DayId}`);
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch trip data");
+      }
+
       const response = await res.json();
 
-      setGetData(response);
-      const days = response.map((data: customTripType) => data.days).flat();
-      setDays(days);
-      setDuration(response[0].duration);
-    } finally {
-      setIsLoading(false);
+      if (Array.isArray(response) && response.length > 0) {
+        setTripData(response[0]);
+        const allDays = response
+          .map((data: customTripType) => data.days)
+          .flat();
+        setDays(allDays);
+      } else if (response && !Array.isArray(response)) {
+        setTripData(response);
+        setDays(response.days || []);
+      }
+    } catch (error) {
+      console.error("Error fetching trip data:", error);
+      toast.error("Аяллын мэдээлэл татахад алдаа гарлаа");
     }
   };
-
-  const isOwner = getData.length > 0 && getData[0].createdById === user?.id;
 
   const getTripMembers = async () => {
-    const res = await fetch("/api/trip/tripMember");
-    const data = await res.json();
-    setTripMembers(data);
-  };
+    if (!DayId) return;
 
-  const joinTrip = async () => {
-    if (!user) return;
+    try {
+      const res = await fetch(`/api/trip/tripMember/`);
 
-    if (hasJoined) {
-      await fetch(`/api/trip/tripMember`, {
-        method: "DELETE",
-        body: JSON.stringify({ userId: user.id }),
-      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch members");
+      }
 
-      setTripMembers((prev) => prev.filter((m) => m.userId !== user?.id));
-    } else {
-      const res = await fetch(`/api/trip/tripMember`, {
-        method: "POST",
-        body: JSON.stringify({
-          userId: user.id,
-          customTripId: DayId,
-        }),
-      });
+      const data = await res.json();
 
-      const newMember = await res.json();
-      setTripMembers((prev) => [...prev, newMember]);
+      const uniqueMembers = data.filter(
+        (member: tripMember, index: number, self: tripMember[]) =>
+          index === self.findIndex((m) => m.userId === member.userId)
+      );
+
+      setTripMembers(uniqueMembers);
+    } catch (error) {
+      console.error("Error fetching members:", error);
     }
-  };
-
-  const deleteMember = async () => {
-    await fetch(`/api/trip/tripMember`, {
-      method: "DELETE",
-      body: JSON.stringify({ userId: user?.id }),
-    });
-    if (!user) {
-      return toast.success("Amjilttai ustgagdlaa!");
-    }
-
-    setTripMembers((prev) => prev.filter((c) => c.id !== user.id));
   };
 
   const getAllUser = async () => {
-    const response = await fetch("/api/user");
-    const allUser = await response.json();
-    setAllUser(allUser);
-  };
+    try {
+      const response = await fetch("/api/user");
 
-  const members = allUser.filter((member) => member.id !== user?.id);
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
 
-  const InviteMember = async (userId: string) => {
-    await fetch("/api/trip/InviteUser", {
-      method: "POST",
-      body: JSON.stringify({
-        userId: user?.id,
-        customTripId: DayId,
-        invitedUserId: userId,
-        status: "PENDING",
-      }),
-    });
-  };
-
-  const InvitedUser = async () => {
-    const response = await fetch("/api/trip/InviteUser");
-    const invitedOne = await response.json();
-    setInvitedOne(invitedOne);
-  };
-
-  const changeReq = async (inviteId: string, status: string) => {
-    await fetch("/api/trip/InviteUser/ChangeReq", {
-      method: "POST",
-      body: JSON.stringify({ status, inviteId }),
-    });
-
-    if (status === "ACCEPTED") {
-      toast.success("amjilttai aylald urigdllee");
-      joinTrip();
+      const allUser = await response.json();
+      setAllUser(allUser);
+    } catch (error) {
+      console.error("Error fetching users:", error);
     }
   };
 
+  const getInvitedUsers = async () => {
+    try {
+      const response = await fetch("/api/trip/InviteUser");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch invitations");
+      }
+
+      const invitations = await response.json();
+      setInvitedUsers(invitations);
+    } catch (error) {
+      console.error("Error fetching invitations:", error);
+    }
+  };
+
+  const joinTrip = async () => {
+    if (!user || !DayId || isJoining) return;
+
+    setIsJoining(true);
+    try {
+      if (hasJoined) {
+        const response = await fetch(`/api/trip/tripMember/`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: user.id }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to leave trip");
+        }
+
+        setTripMembers((prev) => prev.filter((m) => m.userId !== user.id));
+        toast.success("Аяллаас амжилттай гарлаа");
+      } else {
+        const response = await fetch(`/api/trip/tripMember/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            customTripId: DayId,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to join trip");
+        }
+
+        const newMember = await response.json();
+        setTripMembers((prev) => [...prev, newMember]);
+        toast.success("Аялалд амжилттай бүртгүүллээ");
+      }
+    } catch (error) {
+      console.error("Error joining/leaving trip:", error);
+      toast.error("Алдаа гарлаа. Дахин оролдоно уу.");
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const deleteMember = async (memberId: string, userId: string) => {
+    if (!DayId) return;
+
+    try {
+      const response = await fetch(`/api/trip/tripMember/`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to remove member");
+      }
+
+      setTripMembers((prev) => prev.filter((m) => m.userId !== userId));
+      toast.success("Гишүүнийг амжилттай хаслаа");
+    } catch (error) {
+      console.error("Error removing member:", error);
+      toast.error("Гишүүн хасахад алдаа гарлаа");
+    }
+  };
+
+  const inviteMember = async (invitedUserId: string) => {
+    if (!user || !DayId || isInviting) return;
+
+    setIsInviting(invitedUserId);
+    try {
+      const response = await fetch("/api/trip/InviteUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          customTripId: DayId,
+          invitedUserId,
+          status: "PENDING",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send invitation");
+      }
+
+      const newInvite = await response.json();
+      setInvitedUsers((prev) => [...prev, newInvite]);
+      toast.success("Урилга илгээлээ");
+    } catch (error) {
+      console.error("Error inviting member:", error);
+      toast.error("Урилга илгээхэд алдаа гарлаа");
+    } finally {
+      setIsInviting(null);
+    }
+  };
+
+  const handleInviteResponse = async (
+    inviteId: string,
+    status: "ACCEPTED" | "REJECTED"
+  ) => {
+    try {
+      const response = await fetch("/api/trip/InviteUser/ChangeReq", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status, inviteId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to respond to invitation");
+      }
+
+      setInvitedUsers((prev) =>
+        prev.map((inv) =>
+          inv.id === inviteId
+            ? { ...inv, status: status as InvitedStatus }
+            : inv
+        )
+      );
+
+      if (status === "ACCEPTED") {
+        toast.success("Урилгыг хүлээн авлаа");
+        await joinTrip();
+      } else {
+        toast.info("Урилгыг татгалзлаа");
+      }
+    } catch (error) {
+      console.error("Error responding to invitation:", error);
+      toast.error("Алдаа гарлаа. Дахин оролдоно уу.");
+    }
+  };
+
+  const availableUsersToInvite = allUser.filter((u) => {
+    if (u.id === user?.id) return false;
+    if (tripMembers.some((m) => m.userId === u.id)) return false;
+
+    const hasPendingInvite = invitedUsers.some(
+      (inv) =>
+        inv.invitedUserId === u.id &&
+        inv.customTripId === DayId &&
+        inv.status === "PENDING"
+    );
+
+    return !hasPendingInvite;
+  });
+
   useEffect(() => {
-    getCustomTripData();
-    getAllUser();
-    InvitedUser();
-    getTripMembers();
-  }, []);
+    if (!DayId) return;
+
+    async function loadAllData() {
+      setIsLoading(true);
+      try {
+        await Promise.all([
+          getCustomTripData(),
+          getTripMembers(),
+          getAllUser(),
+          getInvitedUsers(),
+        ]);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadAllData();
+  }, [DayId]);
+
+  if (!DayId) {
+    return (
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 mt-16 sm:mt-20 text-center">
+        <p className="text-red-500">Буруу хуудас байна</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 mt-20 text-slate-900">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 mt-16 sm:mt-20 text-slate-900">
       {isLoading ? (
         <>
           <TripHeaderSkeleton />
-          <div className="flex gap-8">
-            <DaysFormSkeleton />
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            <div className="flex-1">
+              <DaysFormSkeleton />
+            </div>
             <MembersSkeleton />
           </div>
         </>
+      ) : !tripData ? (
+        <div className="text-center py-12 sm:py-20">
+          <p className="text-gray-500 text-base sm:text-lg">Аялал олдсонгүй</p>
+        </div>
       ) : (
         <>
-          <div className="mb-8">
-            {getData.map((data, index) => (
-              <div key={index} className="space-y-2">
-                <div className="relative h-[400px] w-full overflow-hidden rounded-3xl shadow-lg">
-                  <img
-                    src={data.images[0]}
-                    alt="trip banner"
-                    className="w-full h-full object-cover"
-                  />
+          <div className="mb-6 sm:mb-8">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="relative h-[250px] sm:h-[350px] md:h-[400px] w-full overflow-hidden rounded-2xl sm:rounded-3xl shadow-lg">
+                <img
+                  src={tripData.images[0]}
+                  alt="trip banner"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight">
+                  {tripData.destination}
+                </h1>
+                <div className="flex items-center gap-2 text-sm sm:text-base text-gray-600">
+                  <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>Аялах хүний тоо:</span>
+                  <span className="font-bold text-black">
+                    {tripData.peopleCount}
+                  </span>
                 </div>
-                <div className="text-3xl font-bold">
-                  {data.destination.toUpperCase()}
-                </div>
-                <div className="flex items-center gap-2">
-                  <User />
-                  Аялах хүний тоо:{" "}
-                  <div className="font-extrabold">{data.peopleCount}</div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar />
-                  Аялах өдрийн тоо:{" "}
-                  <div className="font-extrabold">{duration}</div>
+                <div className="flex items-center gap-2 text-sm sm:text-base text-gray-600">
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>Аялах өдрийн тоо:</span>
+                  <span className="font-bold text-black">
+                    {tripData.duration}
+                  </span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
 
-          <div className="flex gap-8 items-start">
-            <div>
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+            <div className="flex-1 w-full">
               <DynamicCreateForm
                 days={days}
-                duration={duration}
+                duration={tripData.duration}
                 dayId={DayId}
               />
             </div>
-            <div className="border rounded-[2rem] p-8 shadow-xl bg-white w-[360px]">
-              <h3 className="text-xl font-bold mb-6">Аяллын гишүүд</h3>
-              <div>
-                {tripMembers.map((m) => (
-                  <div key={m.id} className="flex justify-between">
-                    <div>{m?.user.name}</div>
-                    {isOwner && (
-                      <Trash
-                        onClick={() => {
-                          deleteMember();
-                        }}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
 
-              <div>
-                {isOwner ? (
-                  <div className="border"></div>
+            <div className="border border-gray-200 rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl bg-white w-full lg:w-[360px] lg:top-6">
+              <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
+                Аяллын гишүүд
+              </h3>
+
+              <div className="space-y-3 mb-4 sm:mb-6">
+                {tripMembers.length > 0 ? (
+                  tripMembers
+                    .filter(
+                      (member, index, self) =>
+                        index ===
+                        self.findIndex((m) => m.userId === member.userId)
+                    )
+                    .map((member) => (
+                      <div
+                        key={member.id}
+                        className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <div className="w-8 h-8 bg-[#2e5d4d] rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                            {member.user.name.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-medium text-sm sm:text-base truncate">
+                            {member.user.name}
+                          </span>
+                          {member.userId === tripData.createdById && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded flex-shrink-0">
+                              Owner
+                            </span>
+                          )}
+                        </div>
+                        {isOwner && member.userId !== tripData.createdById && (
+                          <Trash
+                            onClick={() =>
+                              deleteMember(member.id, member.userId)
+                            }
+                            className="w-4 h-4 text-gray-400 hover:text-red-500 cursor-pointer transition flex-shrink-0 ml-2"
+                          />
+                        )}
+                      </div>
+                    ))
                 ) : (
-                  <div className="mb-4">
-                    <Button
-                      className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer
-    ${
-      hasJoined
-        ? "bg-red-500 text-white hover:bg-red-400 cursor-pointer"
-        : "bg-[#2e5d4d] text-white hover:bg-green-700 shadow-blue-200"
-    }`}
-                      onClick={joinTrip}
-                    >
-                      {hasJoined ? "Аяллаас гарах" : "Аялалд бүртгүүлэх"}
-                    </Button>
-                  </div>
+                  <p className="text-gray-500 text-center py-4 text-sm sm:text-base">
+                    Гишүүн хараахан байхгүй
+                  </p>
                 )}
               </div>
 
-              <div className="space-y-2 mt-6">
-                {isOwner &&
-                  members
-                    .filter(
-                      (user) => !tripMembers.some((tM) => tM.userId === user.id)
-                    )
-                    .map((user) => (
-                      <div
-                        key={user.id}
-                        className="flex justify-between items-center"
-                      >
-                        <div>{user.name.toUpperCase()}</div>
-                        <div>
-                          <Button
-                            variant="ghost"
-                            onClick={() => InviteMember(user.id)}
-                          >
-                            Invite
-                          </Button>
-                        </div>
+              {!isOwner && (
+                <Button
+                  className={`w-full mb-4 sm:mb-6 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-lg ${
+                    hasJoined
+                      ? "bg-red-500 text-white hover:bg-red-600"
+                      : "bg-[#2e5d4d] text-white hover:bg-green-700"
+                  }`}
+                  onClick={joinTrip}
+                  disabled={isJoining}
+                >
+                  {isJoining ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : hasJoined ? (
+                    "Аяллаас гарах"
+                  ) : (
+                    "Аялалд бүртгүүлэх"
+                  )}
+                </Button>
+              )}
 
-                        <Trash
-                          onClick={() => {
-                            deleteMember();
-                          }}
-                        />
-                      </div>
-                    ))}
-
-                {!isOwner &&
-                  invitedOne.map((invite) => (
+              {!isOwner && myPendingInvites.length > 0 && (
+                <div className="mb-4 sm:mb-6 border-t pt-4 sm:pt-6">
+                  <h4 className="font-semibold mb-3 text-sm sm:text-base">
+                    Урилга
+                  </h4>
+                  {myPendingInvites.map((invite) => (
                     <div
                       key={invite.id}
-                      className="flex justify-between items-center"
+                      className="bg-blue-50 p-3 sm:p-4 rounded-lg space-y-3"
                     >
+                      <p className="text-xs sm:text-sm text-gray-700">
+                        Таныг энэ аялалд урьсан байна
+                      </p>
                       <div className="flex gap-2">
                         <Button
-                          variant="ghost"
-                          onClick={() => changeReq(invite.id, "ACCEPTED")}
+                          size="sm"
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
+                          onClick={() =>
+                            handleInviteResponse(invite.id, "ACCEPTED")
+                          }
                         >
-                          Accept
+                          Зөвшөөрөх
                         </Button>
                         <Button
-                          variant="ghost"
-                          onClick={() => changeReq(invite.id, "REJECTED")}
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-xs sm:text-sm"
+                          onClick={() =>
+                            handleInviteResponse(invite.id, "REJECTED")
+                          }
                         >
-                          Reject
+                          Татгалзах
                         </Button>
                       </div>
                     </div>
                   ))}
-              </div>
+                </div>
+              )}
+
+              {isOwner && availableUsersToInvite.length > 0 && (
+                <div className="border-t pt-4 sm:pt-6">
+                  <h4 className="font-semibold mb-3 text-sm sm:text-base">
+                    Хүмүүс урих
+                  </h4>
+                  <div className="space-y-2 max-h-48 sm:max-h-64 overflow-y-auto">
+                    {availableUsersToInvite.map((u) => (
+                      <div
+                        key={u.id}
+                        className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg"
+                      >
+                        <span className="text-xs sm:text-sm truncate flex-1 mr-2">
+                          {u.name}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-[#2e5d4d] hover:text-green-700 text-xs sm:text-sm flex-shrink-0"
+                          onClick={() => inviteMember(u.id)}
+                          disabled={isInviting === u.id}
+                        >
+                          {isInviting === u.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "Урих"
+                          )}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </>

@@ -97,9 +97,10 @@ const Page = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [tripComment, setTripComment] = useState<TripComment[]>([]);
   const [tripCommentInput, setTripCommentInput] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const params = useParams();
-  const { tripId } = params;
+  const tripId = params.tripId as string;
 
   const { user: clerkId } = useUser();
   const { user } = useAuth(clerkId?.id);
@@ -109,94 +110,146 @@ const Page = () => {
   );
 
   const tripDetailComment = async () => {
-    if (!tripCommentInput.trim()) return;
+    if (!tripCommentInput.trim() || !user?.id || isSubmitting) return;
 
-    await fetch(`/api/trip/tripComment/${tripId}`, {
-      method: "POST",
-      body: JSON.stringify({
-        userId: user?.id,
-        comment: tripCommentInput,
-        tripPlanId: trip?.id,
-      }),
-    });
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`/api/trip/tripComment/${tripId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          comment: tripCommentInput.trim(),
+          type: "TRIP",
+        }),
+      });
 
-    setTripCommentInput("");
-    tripCommentGet();
+      if (!response.ok) {
+        throw new Error("Failed to post comment");
+      }
+
+      const newComment = await response.json();
+      setTripComment((prev) => [newComment, ...prev]);
+      setTripCommentInput("");
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      alert("Сэтгэгдэл илгээхэд алдаа гарлаа. Дахин оролдоно уу.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const tripCommentGet = async () => {
-    const res = await fetch(`/api/trip/tripComment/${tripId}`);
-    const comments = await res.json();
-    setTripComment(comments);
-  };
-  const tripCommentDelete = async (commentId: string) => {
-    await fetch(`/api/trip/tripComment/${tripId}`, {
-      method: "DELETE",
-      body: JSON.stringify({ commentId }),
-    });
+    try {
+      const res = await fetch(`/api/trip/tripComment/${tripId}`);
+      if (!res.ok) throw new Error("Failed to fetch comments");
 
-    setTripComment((prev) => prev.filter((c) => c.id !== commentId));
+      const comments = await res.json();
+      setTripComment(comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  const tripCommentDelete = async (commentId: string) => {
+    try {
+      const response = await fetch(`/api/trip/tripComment/${tripId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ commentId }),
+      });
+
+      if (!response.ok) throw new Error("Failed to delete comment");
+
+      setTripComment((prev) => prev.filter((c) => c.id !== commentId));
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("Сэтгэгдэл устгахад алдаа гарлаа.");
+    }
   };
 
   const inputHandlerValue = (e: ChangeEvent<HTMLInputElement>) => {
     setTripCommentInput(e.target.value);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      tripDetailComment();
+    }
+  };
+
   const joinTrip = async () => {
     if (!trip || !user) return;
 
-    if (hasJoined) {
-      await fetch(`/api/trip/tripPlanMember/${trip.id}`, {
-        method: "DELETE",
-        body: JSON.stringify({ userId: user.id }),
-      });
+    try {
+      if (hasJoined) {
+        const response = await fetch(`/api/trip/tripPlanMember/${trip.id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: user.id }),
+        });
 
-      setTripMembers((prev) => prev.filter((m) => m.userId !== user?.id));
-    } else {
-      const res = await fetch(`/api/trip/tripPlanMember/${trip.id}`, {
-        method: "POST",
-        body: JSON.stringify({
-          userId: user.id,
-          tripPlanId: trip.id,
-        }),
-      });
+        if (!response.ok) throw new Error("Failed to leave trip");
 
-      const newMember = await res.json();
-      setTripMembers((prev) => [...prev, newMember]);
+        setTripMembers((prev) => prev.filter((m) => m.userId !== user?.id));
+      } else {
+        const response = await fetch(`/api/trip/tripPlanMember/${trip.id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            tripPlanId: trip.id,
+          }),
+        });
+
+        if (!response.ok) throw new Error("Failed to join trip");
+
+        const newMember = await response.json();
+        setTripMembers((prev) => [...prev, newMember]);
+      }
+    } catch (error) {
+      console.error("Error joining/leaving trip:", error);
+      alert("Аялалд бүртгүүлэх/гарахад алдаа гарлаа.");
     }
   };
 
   useEffect(() => {
-    if (!tripId) return;
-
     async function loadData() {
       setIsLoading(true);
       try {
-        const tripRes = await fetch(
-          `/api/trip/tripGet/getTripDetail/${tripId}`
-        );
+        const [tripRes, daysRes, membersRes] = await Promise.all([
+          fetch(`/api/trip/tripGet/getTripDetail/${tripId}`),
+          fetch(`/api/trip/tripGet/tripsDayByDay/${tripId}`),
+          fetch(`/api/trip/tripPlanMember/${tripId}`),
+        ]);
+
         if (tripRes.ok) {
           const tripData: Trip = await tripRes.json();
           setTrip(tripData);
         }
 
-        const daysRes = await fetch(
-          `/api/trip/tripGet/tripsDayByDay/${tripId}`
-        );
         if (daysRes.ok) {
           const daysData: TripDay[] = await daysRes.json();
           setTripsDayByDay(daysData);
         }
 
-        const bringTripMembers = await fetch(
-          `/api/trip/tripPlanMember/${tripId}`
-        );
-        if (bringTripMembers.ok) {
-          const tripMemberData = await bringTripMembers.json();
-          setTripMembers(tripMemberData);
+        if (membersRes.ok) {
+          const memberData = await membersRes.json();
+          setTripMembers(memberData);
         }
+
+        await tripCommentGet();
       } catch (err) {
-        console.error(err);
+        console.error("Error loading data:", err);
       } finally {
         setIsLoading(false);
       }
@@ -204,10 +257,6 @@ const Page = () => {
 
     loadData();
   }, [tripId]);
-
-  useEffect(() => {
-    tripCommentGet();
-  }, []);
 
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans text-slate-900 mt-20">
@@ -307,52 +356,58 @@ const Page = () => {
                   </div>
                 ) : (
                   <div>
-                    <div>no users yet</div>
+                    <div>Хараахан гишүүн байхгүй байна</div>
                   </div>
                 )}
 
                 <div className="space-y-6">
                   <Button
-                    className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer
-    ${
-      hasJoined
-        ? "bg-red-500 text-white hover:bg-red-400 cursor-pointer"
-        : "bg-[#2e5d4d] text-white hover:bg-green-700 shadow-blue-200"
-    }`}
+                    className={`w-full mt-5 rounded-2xl font-bold text-lg transition-all shadow-lg cursor-pointer ${
+                      hasJoined
+                        ? "bg-red-500 text-white hover:bg-red-400"
+                        : "bg-[#2e5d4d] text-white hover:bg-green-700"
+                    }`}
                     onClick={joinTrip}
+                    disabled={!user}
                   >
                     {hasJoined ? "Аяллаас гарах" : "Аялалд бүртгүүлэх"}
                   </Button>
                 </div>
               </div>
+
               <div className="border border-gray-200 rounded-[2rem] p-8 shadow-xl bg-white">
                 <h3 className="text-xl font-bold mb-6">Сэтгэгдэл</h3>
                 <div>
-                  <div className="space-y-4">
-                    {tripComment.map((c) => (
-                      <div
-                        key={c.id}
-                        className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 shadow-sm flex justify-between items-start"
-                      >
-                        <div className="space-y-1">
-                          <div className="text-sm font-semibold text-gray-800">
-                            {c.user.name}
-                          </div>
-                          <div className="flex">
-                            <p className="text-gray-700 leading-relaxed">
-                              {c.comment}
-                            </p>
-
-                            {c.user.id === user?.id && (
-                              <Trash
-                                onClick={() => tripCommentDelete(c.id)}
-                                className="text-xs text-gray-400 hover:text-red-500 transition cursor-pointer"
-                              ></Trash>
-                            )}
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {tripComment.length > 0 ? (
+                      tripComment.map((c) => (
+                        <div
+                          key={c.id}
+                          className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 shadow-sm"
+                        >
+                          <div className="space-y-1">
+                            <div className="text-sm font-semibold text-gray-800">
+                              {c.user.name}
+                            </div>
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-gray-700 leading-relaxed flex-1">
+                                {c.comment}
+                              </p>
+                              {c.user.id === user?.id && (
+                                <Trash
+                                  onClick={() => tripCommentDelete(c.id)}
+                                  className="w-4 h-4 text-gray-400 hover:text-red-500 transition cursor-pointer flex-shrink-0"
+                                />
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">
+                        Сэтгэгдэл хараахан байхгүй байна
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3 mt-6">
@@ -361,12 +416,18 @@ const Page = () => {
                       type="text"
                       value={tripCommentInput}
                       onChange={inputHandlerValue}
+                      onKeyDown={handleKeyDown}
                       placeholder="Сэтгэгдлээ бичнэ үү..."
                       className="rounded-full pl-5 pr-12 py-6 shadow-sm focus-visible:ring-[#2e5d4d]"
+                      disabled={!user || isSubmitting}
                     />
                     <Send
                       onClick={tripDetailComment}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#2e5d4d] cursor-pointer"
+                      className={`absolute right-4 top-1/2 -translate-y-1/2 transition ${
+                        !user || isSubmitting || !tripCommentInput.trim()
+                          ? "text-gray-300 cursor-not-allowed"
+                          : "text-gray-400 hover:text-[#2e5d4d] cursor-pointer"
+                      }`}
                     />
                   </div>
                 </div>

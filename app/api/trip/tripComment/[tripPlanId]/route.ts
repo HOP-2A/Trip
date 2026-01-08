@@ -1,36 +1,78 @@
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
+type CommentType = "TRIP" | "CUSTOM";
+
 export const POST = async (
   req: NextRequest,
-  context: { params: Promise<{ tripPlanId: string }> }
+  { params }: { params: Promise<{ tripPlanId: string }> }
 ) => {
-  const { tripPlanId } = await context.params;
   const body = await req.json();
-  const { comment, userId } = body;
-  const createdComment = await prisma.tripComment.create({
-    data: { comment, userId, tripPlanId },
+  const {
+    comment,
+    userId,
+    type,
+  }: {
+    comment: string;
+    userId: string;
+    type: CommentType;
+  } = body;
+
+  if (!comment || !userId || !type) {
+    return NextResponse.json(
+      { error: "missing required fields" },
+      { status: 400 }
+    );
+  }
+
+  const { tripPlanId } = await params;
+
+  const data =
+    type === "CUSTOM"
+      ? {
+          comment,
+          userId,
+          customTripId: tripPlanId,
+        }
+      : {
+          comment,
+          userId,
+          tripPlanId: tripPlanId,
+        };
+
+  const created = await prisma.tripComment.create({
+    data,
+    include: { user: true },
   });
-  return NextResponse.json(createdComment);
+
+  return NextResponse.json(created);
 };
 
 export const GET = async (
-  req: NextRequest,
-  context: { params: Promise<{ tripPlanId: string }> }
+  _: NextRequest,
+  { params }: { params: Promise<{ tripPlanId: string }> }
 ) => {
-  const { tripPlanId } = await context.params;
-  const response = await prisma.tripComment.findMany({
-    where: { tripPlanId },
-    include: {
-      user: true,
+  const { tripPlanId } = await params;
+  const comments = await prisma.tripComment.findMany({
+    where: {
+      OR: [{ tripPlanId: tripPlanId }, { customTripId: tripPlanId }],
     },
+    include: { user: true },
   });
-  return NextResponse.json(response);
+
+  return NextResponse.json(comments);
 };
+
 export const DELETE = async (req: NextRequest) => {
-  const { commentId } = await req.json();
-  const deletedComment = await prisma.tripComment.delete({
+  const { commentId }: { commentId: string } = await req.json();
+
+  if (!commentId) {
+    return NextResponse.json({ error: "commentId required" }, { status: 400 });
+  }
+
+  await prisma.tripComment.delete({
     where: { id: commentId },
   });
-  return NextResponse.json(deletedComment);
+
+  return NextResponse.json({ success: true });
 };
