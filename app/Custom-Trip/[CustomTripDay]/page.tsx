@@ -3,12 +3,13 @@
 import DynamicCreateForm from "@/app/_components/Form";
 import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { InvitedStatus } from "@prisma/client";
 import { toast } from "sonner";
-import { Calendar, Trash, User, Loader2 } from "lucide-react";
+import { Calendar, Trash, User, Loader2, Send } from "lucide-react";
 
 type customTripType = {
   destination: string;
@@ -51,6 +52,15 @@ type tripMember = {
   role: string;
   userId: string;
   user: {
+    name: string;
+  };
+};
+
+type TripComment = {
+  id: string;
+  comment: string;
+  user: {
+    id: string;
     name: string;
   };
 };
@@ -101,6 +111,10 @@ const Page = () => {
   const [allUser, setAllUser] = useState<UserType[]>([]);
   const [tripMembers, setTripMembers] = useState<tripMember[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<InviteUserType[]>([]);
+
+  const [tripComment, setTripComment] = useState<TripComment[]>([]);
+  const [tripCommentInput, setTripCommentInput] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const hasJoined = tripMembers.some(
     (member: tripMember) => member.userId === user?.id
@@ -193,6 +207,84 @@ const Page = () => {
       setInvitedUsers(invitations);
     } catch (error) {
       console.error("Error fetching invitations:", error);
+    }
+  };
+
+  const tripCommentGet = async () => {
+    if (!DayId) return;
+
+    try {
+      const res = await fetch(`/api/trip/tripComment/${DayId}`);
+      if (!res.ok) throw new Error("Failed to fetch comments");
+
+      const comments = await res.json();
+      setTripComment(comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  const tripDetailComment = async () => {
+    if (!tripCommentInput.trim() || !user?.id || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`/api/trip/tripComment/${DayId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          comment: tripCommentInput.trim(),
+          type: "CUSTOM",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to post comment");
+      }
+
+      const newComment = await response.json();
+      setTripComment((prev) => [newComment, ...prev]);
+      setTripCommentInput("");
+      toast.success("Сэтгэгдэл амжилттай нэмэгдлээ");
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      toast.error("Сэтгэгдэл илгээхэд алдаа гарлаа");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const tripCommentDelete = async (commentId: string) => {
+    try {
+      const response = await fetch(`/api/trip/tripComment/${DayId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ commentId }),
+      });
+
+      if (!response.ok) throw new Error("Failed to delete comment");
+
+      setTripComment((prev) => prev.filter((c) => c.id !== commentId));
+      toast.success("Сэтгэгдэл устгагдлаа");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      toast.error("Сэтгэгдэл устгахад алдаа гарлаа");
+    }
+  };
+
+  const inputHandlerValue = (e: ChangeEvent<HTMLInputElement>) => {
+    setTripCommentInput(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      tripDetailComment();
     }
   };
 
@@ -363,6 +455,7 @@ const Page = () => {
           getTripMembers(),
           getAllUser(),
           getInvitedUsers(),
+          tripCommentGet(),
         ]);
       } catch (error) {
         console.error("Error loading data:", error);
@@ -440,145 +533,206 @@ const Page = () => {
               />
             </div>
 
-            <div className="border border-gray-200 rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl bg-white w-full lg:w-[360px] lg:top-6">
-              <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
-                Аяллын гишүүд
-              </h3>
+            <div className="space-y-6 w-full lg:w-[360px]">
+              <div className="border border-gray-200 rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl bg-white lg:top-6">
+                <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
+                  Аяллын гишүүд
+                </h3>
 
-              <div className="space-y-3 mb-4 sm:mb-6">
-                {tripMembers.length > 0 ? (
-                  tripMembers
-                    .filter(
-                      (member, index, self) =>
-                        index ===
-                        self.findIndex((m) => m.userId === member.userId)
-                    )
-                    .map((member) => (
-                      <div
-                        key={member.id}
-                        className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                      >
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <div className="w-8 h-8 bg-[#2e5d4d] rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                            {member.user.name.charAt(0).toUpperCase()}
-                          </div>
-                          <span className="font-medium text-sm sm:text-base truncate">
-                            {member.user.name}
-                          </span>
-                          {member.userId === tripData.createdById && (
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded flex-shrink-0">
-                              Owner
+                <div className="space-y-3 mb-4 sm:mb-6">
+                  {tripMembers.length > 0 ? (
+                    tripMembers
+                      .filter(
+                        (member, index, self) =>
+                          index ===
+                          self.findIndex((m) => m.userId === member.userId)
+                      )
+                      .map((member) => (
+                        <div
+                          key={member.id}
+                          className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <div className="w-8 h-8 bg-[#2e5d4d] rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                              {member.user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="font-medium text-sm sm:text-base truncate">
+                              {member.user.name}
                             </span>
-                          )}
+                            {member.userId === tripData.createdById && (
+                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded flex-shrink-0">
+                                Owner
+                              </span>
+                            )}
+                          </div>
+                          {isOwner &&
+                            member.userId !== tripData.createdById && (
+                              <Trash
+                                onClick={() =>
+                                  deleteMember(member.id, member.userId)
+                                }
+                                className="w-4 h-4 text-gray-400 hover:text-red-500 cursor-pointer transition flex-shrink-0 ml-2"
+                              />
+                            )}
                         </div>
-                        {isOwner && member.userId !== tripData.createdById && (
-                          <Trash
-                            onClick={() =>
-                              deleteMember(member.id, member.userId)
-                            }
-                            className="w-4 h-4 text-gray-400 hover:text-red-500 cursor-pointer transition flex-shrink-0 ml-2"
-                          />
-                        )}
-                      </div>
-                    ))
-                ) : (
-                  <p className="text-gray-500 text-center py-4 text-sm sm:text-base">
-                    Гишүүн хараахан байхгүй
-                  </p>
-                )}
-              </div>
-
-              {!isOwner && (
-                <Button
-                  className={`w-full mb-4 sm:mb-6 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-lg ${
-                    hasJoined
-                      ? "bg-red-500 text-white hover:bg-red-600"
-                      : "bg-[#2e5d4d] text-white hover:bg-green-700"
-                  }`}
-                  onClick={joinTrip}
-                  disabled={isJoining}
-                >
-                  {isJoining ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : hasJoined ? (
-                    "Аяллаас гарах"
+                      ))
                   ) : (
-                    "Аялалд бүртгүүлэх"
+                    <p className="text-gray-500 text-center py-4 text-sm sm:text-base">
+                      Гишүүн хараахан байхгүй
+                    </p>
                   )}
-                </Button>
-              )}
-
-              {!isOwner && myPendingInvites.length > 0 && (
-                <div className="mb-4 sm:mb-6 border-t pt-4 sm:pt-6">
-                  <h4 className="font-semibold mb-3 text-sm sm:text-base">
-                    Урилга
-                  </h4>
-                  {myPendingInvites.map((invite) => (
-                    <div
-                      key={invite.id}
-                      className="bg-blue-50 p-3 sm:p-4 rounded-lg space-y-3"
-                    >
-                      <p className="text-xs sm:text-sm text-gray-700">
-                        Таныг энэ аялалд урьсан байна
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          className="flex-1 bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
-                          onClick={() =>
-                            handleInviteResponse(invite.id, "ACCEPTED")
-                          }
-                        >
-                          Зөвшөөрөх
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 text-xs sm:text-sm"
-                          onClick={() =>
-                            handleInviteResponse(invite.id, "REJECTED")
-                          }
-                        >
-                          Татгалзах
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
                 </div>
-              )}
 
-              {isOwner && availableUsersToInvite.length > 0 && (
-                <div className="border-t pt-4 sm:pt-6">
-                  <h4 className="font-semibold mb-3 text-sm sm:text-base">
-                    Хүмүүс урих
-                  </h4>
-                  <div className="space-y-2 max-h-48 sm:max-h-64 overflow-y-auto">
-                    {availableUsersToInvite.map((u) => (
+                {!isOwner && (
+                  <Button
+                    className={`w-full mb-4 sm:mb-6 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all shadow-lg ${
+                      hasJoined
+                        ? "bg-red-500 text-white hover:bg-red-600"
+                        : "bg-[#2e5d4d] text-white hover:bg-green-700"
+                    }`}
+                    onClick={joinTrip}
+                    disabled={isJoining}
+                  >
+                    {isJoining ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : hasJoined ? (
+                      "Аяллаас гарах"
+                    ) : (
+                      "Аялалд бүртгүүлэх"
+                    )}
+                  </Button>
+                )}
+
+                {!isOwner && myPendingInvites.length > 0 && (
+                  <div className="mb-4 sm:mb-6 border-t pt-4 sm:pt-6">
+                    <h4 className="font-semibold mb-3 text-sm sm:text-base">
+                      Урилга
+                    </h4>
+                    {myPendingInvites.map((invite) => (
                       <div
-                        key={u.id}
-                        className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg"
+                        key={invite.id}
+                        className="bg-blue-50 p-3 sm:p-4 rounded-lg space-y-3"
                       >
-                        <span className="text-xs sm:text-sm truncate flex-1 mr-2">
-                          {u.name}
-                        </span>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-[#2e5d4d] hover:text-green-700 text-xs sm:text-sm flex-shrink-0"
-                          onClick={() => inviteMember(u.id)}
-                          disabled={isInviting === u.id}
-                        >
-                          {isInviting === u.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            "Урих"
-                          )}
-                        </Button>
+                        <p className="text-xs sm:text-sm text-gray-700">
+                          Таныг энэ аялалд урьсан байна
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
+                            onClick={() =>
+                              handleInviteResponse(invite.id, "ACCEPTED")
+                            }
+                          >
+                            Зөвшөөрөх
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 text-xs sm:text-sm"
+                            onClick={() =>
+                              handleInviteResponse(invite.id, "REJECTED")
+                            }
+                          >
+                            Татгалзах
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
+                )}
+
+                {isOwner && availableUsersToInvite.length > 0 && (
+                  <div className="border-t pt-4 sm:pt-6">
+                    <h4 className="font-semibold mb-3 text-sm sm:text-base">
+                      Хүмүүс урих
+                    </h4>
+                    <div className="space-y-2 max-h-48 sm:max-h-64 overflow-y-auto">
+                      {availableUsersToInvite.map((u) => (
+                        <div
+                          key={u.id}
+                          className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg"
+                        >
+                          <span className="text-xs sm:text-sm truncate flex-1 mr-2">
+                            {u.name}
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-[#2e5d4d] hover:text-green-700 text-xs sm:text-sm flex-shrink-0"
+                            onClick={() => inviteMember(u.id)}
+                            disabled={isInviting === u.id}
+                          >
+                            {isInviting === u.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              "Урих"
+                            )}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="border border-gray-200 rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl bg-white">
+                <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
+                  Сэтгэгдэл
+                </h3>
+                <div className="space-y-4 max-h-96 overflow-y-auto mb-6">
+                  {tripComment.length > 0 ? (
+                    tripComment.map((c) => (
+                      <div
+                        key={c.id}
+                        className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 shadow-sm"
+                      >
+                        <div className="space-y-1">
+                          <div className="text-sm font-semibold text-gray-800">
+                            {c.user.name}
+                          </div>
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-gray-700 leading-relaxed flex-1 text-sm">
+                              {c.comment}
+                            </p>
+                            {c.user.id === user?.id && (
+                              <Trash
+                                onClick={() => tripCommentDelete(c.id)}
+                                className="w-4 h-4 text-gray-400 hover:text-red-500 transition cursor-pointer flex-shrink-0"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center py-4 text-sm sm:text-base">
+                      Сэтгэгдэл хараахан байхгүй байна
+                    </p>
+                  )}
                 </div>
-              )}
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <Input
+                      type="text"
+                      value={tripCommentInput}
+                      onChange={inputHandlerValue}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Сэтгэгдлээ бичнэ үү..."
+                      className="rounded-full pl-5 pr-12 py-6 shadow-sm focus-visible:ring-[#2e5d4d]"
+                      disabled={!user || isSubmitting}
+                    />
+                    <Send
+                      onClick={tripDetailComment}
+                      className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 transition ${
+                        !user || isSubmitting || !tripCommentInput.trim()
+                          ? "text-gray-300 cursor-not-allowed"
+                          : "text-gray-400 hover:text-[#2e5d4d] cursor-pointer"
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </>
