@@ -1,39 +1,45 @@
-// import * as React from "react";
+"use client";
 
-// import { Card, CardContent } from "@/components/ui/card";
-// import {
-//   Carousel,
-//   CarouselContent,
-//   CarouselItem,
-//   CarouselNext,
-//   CarouselPrevious,
-// } from "@/components/ui/carousel";
-// import Autoplay from "embla-carousel-autoplay";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { useRef } from "react";
+import Autoplay from "embla-carousel-autoplay";
 
-// export function CarouselOrientation(data: { data: string[] }) {
-//   const plugIn = React.useRef(
-//     Autoplay({ delay: 2000, stopOnInteraction: true })
-//   );
-//   return (
-//     <div>
-//       <Carousel
-//         plugins={[plugIn.current]}
-//         onMouseEnter={plugIn.current.stop}
-//         onMouseLeave={plugIn.current.reset}
-//         className="w-full max-w-xs"
-//       >
-//         <CarouselContent>
-//           {post.images.map((postImg, index) => (
-//             <CarouselItem key={index}>
-//               <div className="p-1">
-//                 <img src={postImg} />
-//               </div>
-//             </CarouselItem>
-//           ))}
-//         </CarouselContent>
-//         <CarouselPrevious hidden={true} />
-//         <CarouselNext hidden={true} />
-//       </Carousel>
-//     </div>
-//   );
-// }
+export const CarouselFunc = ({ data }: { data: string[] }) => {
+  const autoplay = useRef(
+    Autoplay({
+      delay: 2000,
+      stopOnInteraction: false, // ⬅️ заавал false
+    })
+  );
+
+  return (
+    <Carousel
+      plugins={[autoplay.current]}
+      onMouseEnter={() => autoplay.current.stop()}
+      onMouseLeave={() => autoplay.current.reset()}
+      className="h-[400px] w-full overflow-hidden rounded-3xl shadow-lg"
+    >
+      <CarouselContent className="h-full">
+        {data.map((postImg, index) => {
+          return (
+            <CarouselItem key={index} className="h-full">
+              <div
+                className="h-[400px] bg-cover bg-center"
+                style={{ backgroundImage: `url(${postImg})` }}
+              />
+            </CarouselItem>
+          );
+        })}
+      </CarouselContent>
+
+      <CarouselPrevious hidden />
+      <CarouselNext hidden />
+    </Carousel>
+  );
+};

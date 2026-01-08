@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-type customTripType = {
+export type customTripType = {
   destination: string;
   endDate: string;
   startDate: string;
@@ -55,6 +55,7 @@ import { Button } from "@/components/ui/button";
 import { InvitedStatus } from "@prisma/client";
 import { toast } from "sonner";
 import { Calendar, Trash, User } from "lucide-react";
+import { CarouselFunc } from "@/app/_components/carousel";
 
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
@@ -225,14 +226,7 @@ const Page = () => {
           <div className="mb-8">
             {getData.map((data, index) => (
               <div key={index} className="space-y-2">
-                <div className="relative h-[400px] w-full overflow-hidden rounded-3xl shadow-lg">
-                  {/* <CarouselOrientation data={data.images} /> */}
-                  <img
-                    src={data.images[0]}
-                    alt="trip banner"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                <CarouselFunc data={data.images} />
                 <div className="text-3xl font-bold">
                   {data.destination.toUpperCase()}
                 </div>
