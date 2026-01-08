@@ -2,6 +2,7 @@ import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 export const GenerateImage = ({
   imageUrl,
@@ -54,13 +55,19 @@ export const GenerateImage = ({
         disabled={isLoading}
       />
       <Button
-        onClick={() => {
-          generateImage();
-        }}
-        variant="outline"
-        className="cursor-pointer"
+        onClick={generateImage}
+        disabled={!prompt.trim() || isLoading}
+        className={`bg-[#2e5d4d] shadow  w-[110px] transition-all duration-200 font-semibold rounded-lg ${
+          !prompt.trim() || (isLoading && "cursor-not-allowed")
+        }`}
       >
-        Generate
+        {isLoading ? (
+          <div className="flex justify-items-center">
+            <Spinner /> Generating ...
+          </div>
+        ) : (
+          "Generate"
+        )}
       </Button>
     </div>
   );

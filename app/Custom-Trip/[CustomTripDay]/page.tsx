@@ -54,7 +54,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { InvitedStatus } from "@prisma/client";
 import { toast } from "sonner";
-import { Calendar, Delete, DeleteIcon, Trash, User } from "lucide-react";
+import { Calendar, Trash, User } from "lucide-react";
 
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
@@ -153,10 +153,10 @@ const Page = () => {
     }
   };
 
-  const deleteMember = async () => {
+  const deleteMember = async (mId: string) => {
     await fetch(`/api/trip/tripMember`, {
       method: "DELETE",
-      body: JSON.stringify({ userId: user?.id }),
+      body: JSON.stringify({ userId: mId }),
     });
     if (!user) {
       return toast.success("Amjilttai ustgagdlaa!");
@@ -226,6 +226,7 @@ const Page = () => {
             {getData.map((data, index) => (
               <div key={index} className="space-y-2">
                 <div className="relative h-[400px] w-full overflow-hidden rounded-3xl shadow-lg">
+                  {/* <CarouselOrientation data={data.images} /> */}
                   <img
                     src={data.images[0]}
                     alt="trip banner"
@@ -266,9 +267,15 @@ const Page = () => {
                     {isOwner && (
                       <Trash
                         onClick={() => {
-                          deleteMember();
+                          deleteMember(m.id);
                         }}
                       />
+                    )}
+                    {m.id === user?.id && (
+                      <Trash
+                        onClick={() => deleteMember(m.id)}
+                        className="text-xs text-gray-400 hover:text-red-500 transition cursor-pointer"
+                      ></Trash>
                     )}
                   </div>
                 ))}
@@ -317,7 +324,7 @@ const Page = () => {
 
                         <Trash
                           onClick={() => {
-                            deleteMember();
+                            deleteMember(user.id);
                           }}
                         />
                       </div>
