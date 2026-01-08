@@ -31,12 +31,15 @@ model User {
 }
 
 model TripComment {
-  id         String    @id @default(nanoid())
-  comment    String
-  userId     String?
-  tripPlanId String?
-  user       User?     @relation(fields: [userId], references: [id])
-  tripPlan   TripPlan? @relation(fields: [tripPlanId], references: [id])
+  id           String  @id @default(nanoid())
+  comment      String
+  userId       String?
+  tripPlanId   String?
+  customTripId String?
+
+  user       User?       @relation(fields: [userId], references: [id])
+  tripPlan   TripPlan?   @relation(fields: [tripPlanId], references: [id])
+  customTrip CustomTrip? @relation(fields: [customTripId], references: [id])
 }
 
 model CustomTrip {
@@ -55,6 +58,7 @@ model CustomTrip {
   days           CustomTripDay[]
   members        TripMember[]
   invitedMembers InvitedMember[]
+  tripComments   TripComment[]
 }
 
 model TripMember {
