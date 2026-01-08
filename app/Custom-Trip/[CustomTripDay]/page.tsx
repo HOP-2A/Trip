@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { InvitedStatus } from "@prisma/client";
 import { toast } from "sonner";
 import { Calendar, Trash, User, Loader2, Send } from "lucide-react";
+import { CarouselFunc } from "@/app/_components/carousel";
 
 type customTripType = {
   destination: string;
@@ -496,11 +497,7 @@ const Page = () => {
           <div className="mb-6 sm:mb-8">
             <div className="space-y-3 sm:space-y-4">
               <div className="relative h-[250px] sm:h-[350px] md:h-[400px] w-full overflow-hidden rounded-2xl sm:rounded-3xl shadow-lg">
-                <img
-                  src={tripData.images[0]}
-                  alt="trip banner"
-                  className="w-full h-full object-cover"
-                />
+                <CarouselFunc data={tripData.images} />
               </div>
               <div className="space-y-2">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight">
